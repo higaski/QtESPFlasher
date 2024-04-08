@@ -1,0 +1,78 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug QtESPFlasher CLI flash A",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/QtESPFlasher",
+      "args": [
+        "write_flash",
+        "0x1000",
+        "/home/vinci/Desktop/esp32_a/bootloader/bootloader.bin",
+        "0x10000",
+        "/home/vinci/Desktop/esp32_a/hello_world.bin",
+        "0x8000",
+        "/home/vinci/Desktop/esp32_a/partition_table/partition-table.bin"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": false
+        }
+      ]
+    },
+    {
+      "name": "Debug QtESPFlasher CLI flash B",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/QtESPFlasher",
+      "args": [
+        "write_flash",
+        "0x1000",
+        "/home/vinci/Desktop/esp32_b/bootloader/bootloader.bin",
+        "0x10000",
+        "/home/vinci/Desktop/esp32_b/hello_world.bin",
+        "0x8000",
+        "/home/vinci/Desktop/esp32_b/partition_table/partition-table.bin"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": false
+        }
+      ]
+    },
+    {
+      "name": "Debug QtESPFlasher GUI",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/QtESPFlasher",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": false
+        }
+      ]
+    }
+  ]
+}

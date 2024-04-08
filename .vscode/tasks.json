@@ -1,0 +1,59 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake QtESPFlasher Debug",
+      "type": "shell",
+      "isBackground": true,
+      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug"
+    },
+    {
+      "label": "CMake QtESPFlasher Release",
+      "type": "shell",
+      "isBackground": true,
+      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release"
+    },
+    {
+      "label": "CMake QtESPFlasher Release x86_64-w64-mingw32",
+      "type": "shell",
+      "isBackground": true,
+      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=CMakeModules/cmake/toolchain-x86_64-w64-mingw32-gcc.cmake"
+    },
+    {
+      "label": "Ninja QtESPFlasher",
+      "type": "shell",
+      "isBackground": true,
+      "command": "ninja -C build QtESPFlasher"
+    },
+    {
+      "label": "Run QtESPFlasher",
+      "type": "shell",
+      "isBackground": true,
+      "command": "./build/QtESPFlasher"
+    },
+    {
+      "label": "Run QtESPFlasher valgrind",
+      "type": "shell",
+      "isBackground": true,
+      "command": "valgrind --error-exitcode=1 --leak-check=yes --errors-for-leak-kinds=definite,indirect ./build/QtESPFlasher"
+    },
+    {
+      "label": "act x86_64-linux-gnu-gcc",
+      "type": "shell",
+      "isBackground": true,
+      "command": "act --artifact-server-path build -j x86_64-linux-gnu-gcc"
+    },
+    {
+      "label": "act x86_64-w64-mingw32-gcc",
+      "type": "shell",
+      "isBackground": true,
+      "command": "act --artifact-server-path build -j x86_64-w64-mingw32-gcc"
+    },
+    {
+      "label": "act",
+      "type": "shell",
+      "isBackground": true,
+      "command": "act --artifact-server-path build"
+    }
+  ]
+}
