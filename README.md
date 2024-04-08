@@ -14,9 +14,7 @@ It currently supports the following ESP microcontrollers:
 - [ESP32H2](https://www.espressif.com/en/products/socs/esp32-h2)
 - [ESP32C6](https://www.espressif.com/en/products/socs/esp32-c6)
 
-#### Latest release
-- [QtESPFlasher-0.0.0-Linux-x64.zip](https://github.com/higaski/QtESPFlasher)
-- [QtESPFlasher-0.0.0-Windows-x64.zip](https://github.com/higaski/QtESPFlasher)
+### [Latest release](https://github.com/higaski/QtESPFlasher/releases/latest)
 
 <details>
   <summary>Table of contents</summary>
