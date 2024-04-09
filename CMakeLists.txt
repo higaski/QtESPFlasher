@@ -208,7 +208,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
       -DINPUT_libjpeg=no
       -DINPUT_libmd4c=no)
   elseif(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    # Install Qt6 for host
+    # Install Qt6 for host using https://github.com/miurahr/aqtinstall
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
     execute_process(
       COMMAND
@@ -410,6 +410,8 @@ cpmaddpackage(
   GITHUB_REPOSITORY
   higaski/esp-serial-flasher
   GIT_TAG
+  # TODO actual tag once #103 got merged
+  # https://github.com/espressif/esp-serial-flasher/pull/103
   928dd73850c2c2cd689ecdeb854afe7b2b159622
   VERSION
   1.3.0
@@ -458,7 +460,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
     URL
     https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip
     VERSION
-    ${ARG_VERSION}
+    2.37
     DOWNLOAD_ONLY
     TRUE)
   add_custom_command(
@@ -528,7 +530,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
         -targetDir ${TARGET_DIR} #
         -verbose 3 #
         -platform win_x86_64 #
-        -icon ${CMAKE_CURRENT_SOURCE_DIR}/data/images/icon.ico #
     )
   endif()
 
