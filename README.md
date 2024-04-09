@@ -14,8 +14,6 @@ It currently supports the following ESP microcontrollers:
 - [ESP32H2](https://www.espressif.com/en/products/socs/esp32-h2)
 - [ESP32C6](https://www.espressif.com/en/products/socs/esp32-c6)
 
-### [Latest release](https://github.com/higaski/QtESPFlasher/releases/latest)
-
 <details>
   <summary>Table of contents</summary>
   <ol>
@@ -25,7 +23,7 @@ It currently supports the following ESP microcontrollers:
         <li><a href="#reset-modes">Reset modes</a></li>
         <li><a href="#disabling-the-stub-loader">Disabling the stub loader</a></li>
         <li><a href="#trace">Trace</a></li>
-        <li><a href="#chip-type">Trace</a></li>
+        <li><a href="#chip-type">Chip type</a></li>
         <li><a href="#serial-port">Serial port</a></li>
         <li><a href="#baud-rate">Baud rate</a></li>
       </ul>
