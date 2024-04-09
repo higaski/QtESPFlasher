@@ -509,7 +509,7 @@ void EspFlasher::transfer_debug_print(uint8_t const* data,
   if (_trace != "trace") return;
 
   static auto const log_path{
-    QCoreApplication::applicationDirPath().toStdString() + "/trace.txt"};
+    QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
   static auto fd{fopen(log_path.c_str(), "w")};
   static gsl::final_action close{[&fd] { fclose(fd); }};
 
