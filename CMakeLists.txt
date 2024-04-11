@@ -401,14 +401,14 @@ qt_add_resources(
   FILES
   data/images/logo.png)
 
-cpmaddpackage(gh:Neargye/magic_enum@0.9.5)
-cpmaddpackage(gh:microsoft/GSL@4.0.0)
-cpmaddpackage(gh:ZIMO-Elektronik/QtBreeze@5.115.0)
+cpmaddpackage("gh:Neargye/magic_enum@0.9.5")
+cpmaddpackage("gh:microsoft/GSL@4.0.0")
+cpmaddpackage("gh:ZIMO-Elektronik/QtBreeze@5.115.0")
 cpmaddpackage(
   NAME
   esp-serial-flasher
   GITHUB_REPOSITORY
-  higaski/esp-serial-flasher
+  "higaski/esp-serial-flasher"
   GIT_TAG
   # TODO actual tag once #103 got merged
   # https://github.com/espressif/esp-serial-flasher/pull/103
@@ -425,7 +425,7 @@ cpmaddpackage(
   NAME
   quazip
   GITHUB_REPOSITORY
-  stachenov/quazip
+  "stachenov/quazip"
   VERSION
   1.4
   SYSTEM
@@ -458,7 +458,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
     NAME
     dejavu-fonts
     URL
-    https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip
+    "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip"
     VERSION
     2.37
     DOWNLOAD_ONLY

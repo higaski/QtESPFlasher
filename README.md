@@ -36,6 +36,7 @@ It currently supports the following ESP microcontrollers:
 </details>
 
 ## Features
+- **No dependencies**
 - GUI flashes either
   - an [ESP-IDF](https://github.com/espressif/esp-idf) build directory
   - a [flasher_args.json](https://github.com/espressif/esp-idf/blob/master/components/esptool_py/flasher_args.json.in) file
