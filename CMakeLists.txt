@@ -4,8 +4,8 @@ include(FetchContent)
 
 FetchContent_Declare(
   CMakeModules
-  GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.8.0
+  GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
+  GIT_TAG v0.9.1
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -412,7 +412,7 @@ cpmaddpackage(
   GIT_TAG
   # TODO actual tag once #103 got merged
   # https://github.com/espressif/esp-serial-flasher/pull/103
-  928dd73850c2c2cd689ecdeb854afe7b2b159622
+  3b17882987fe5f84fa160ced937ce15c98bb07e6
   VERSION
   1.3.0
   SYSTEM
