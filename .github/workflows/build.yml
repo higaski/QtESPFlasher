@@ -30,7 +30,7 @@ jobs:
           path: ${{ env.ARTIFACT_PATH }}
 
   x86_64-w64-mingw32-gcc:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -38,14 +38,8 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt update -y
-          sudo apt install -y ninja-build
-          sudo pip install aqtinstall
-          sudo wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/m/mingw-w64/mingw-w64_11.0.1-2_all.deb
-          sudo apt install -y ./mingw-w64_11.0.1-2_all.deb
-          sudo wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/libz/libz-mingw-w64/libz-mingw-w64_1.3.1%2Bdfsg-1_all.deb
-          sudo apt install -y ./libz-mingw-w64_1.3.1+dfsg-1_all.deb
-          sudo wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/libz/libz-mingw-w64/libz-mingw-w64-dev_1.3.1%2Bdfsg-1_all.deb
-          sudo apt install -y ./libz-mingw-w64-dev_1.3.1+dfsg-1_all.deb
+          sudo apt install -y libz-mingw-w64 libz-mingw-w64-dev mingw-w64 ninja-build
+          sudo pip install aqtinstall --break-system-packages
       - run: cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=CMakeModules/cmake/toolchain-x86_64-w64-mingw32-gcc.cmake
       - run: cmake --build build --parallel --target QtESPFlasher
       - name: Find archive file
