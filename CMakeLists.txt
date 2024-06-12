@@ -393,7 +393,17 @@ find_qt(REQUIRED COMPONENTS Core SerialPort Widgets)
 
 qt_add_resources(
   QtESPFlasher
-  logo
+  qtespflasher_fonts
+  PREFIX
+  fonts
+  BASE
+  data/fonts
+  FILES
+  data/fonts/DejaVuSansMono.ttf)
+
+qt_add_resources(
+  QtESPFlasher
+  qtespflasher_images
   PREFIX
   images
   BASE
@@ -452,25 +462,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
   # Output directory of .zip files
   set(TARGET_DIR ${CMAKE_BINARY_DIR}/DistributionKit)
 
-  # Qt6 does not ship with fonts and we have built without fontconfig, so get a
-  # free font and copy it
-  cpmaddpackage(
-    NAME
-    dejavu-fonts
-    URL
-    "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip"
-    VERSION
-    2.37
-    DOWNLOAD_ONLY
-    TRUE)
-  add_custom_command(
-    TARGET QtESPFlasher
-    POST_BUILD
-    COMMAND
-      ${CMAKE_COMMAND} -E copy
-      ${dejavu-fonts_SOURCE_DIR}/ttf/DejaVuSansMono.ttf
-      ${TARGET_DIR}/lib/fonts/DejaVuSansMono.ttf)
-
   if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     # Get an old version of CQtDeployer compatible with GLIB 2.31
     find_package(CQtDeployer 1.5.4.17 COMPONENTS Linux)
@@ -495,7 +486,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
       POST_BUILD
       COMMAND
         ${CQTDEPLOYER_EXECUTABLE} #
-        clear #
+        force-clear #
         noTranslations #
         -bin $<TARGET_FILE:QtESPFlasher> #
         -qmake ${QMAKE_EXECUTABLE} #
@@ -521,7 +512,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
       POST_BUILD
       COMMAND
         ${CQTDEPLOYER_EXECUTABLE} #
-        clear #
+        force-clear #
         noTranslations #
         -bin $<TARGET_FILE:QtESPFlasher> #
         -qmake ${QMAKE_EXECUTABLE} #

@@ -10,6 +10,7 @@
 
 #include "gui.hpp"
 #include <QFile>
+#include <QFontDatabase>
 #include "main_window.hpp"
 
 /// Run GUI
@@ -17,11 +18,21 @@
 /// \param  app Application instance
 /// \return ​0​ if the GUI succeeds, nonzero value otherwise
 int gui(QApplication& app) {
+  // Initialize resources
   Q_INIT_RESOURCE(qtbreeze_stylesheets);
+
+  // Default to monospace font
+  QFontDatabase::addApplicationFont(":/fonts/DejaVuSansMono.ttf");
+  QFont font{"DejaVuSansMono"};
+  font.setPointSize(10);
+  app.setFont(font);
+
+  // Apply breeze stylesheet
   QFile file{":/dark/stylesheet.qss"};
   file.open(QFile::ReadOnly | QFile::Text);
   QTextStream stream{&file};
   app.setStyleSheet(stream.readAll());
+
   MainWindow w{};
   w.show();
   return app.exec();
