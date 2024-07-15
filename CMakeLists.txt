@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
-  GIT_TAG v0.9.1
+  GIT_TAG v0.9.2
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -418,18 +418,16 @@ cpmaddpackage(
   NAME
   esp-serial-flasher
   GITHUB_REPOSITORY
-  "higaski/esp-serial-flasher"
-  GIT_TAG
-  # TODO actual tag once #103 got merged
-  # https://github.com/espressif/esp-serial-flasher/pull/103
-  3b17882987fe5f84fa160ced937ce15c98bb07e6
+  "espressif/esp-serial-flasher"
   VERSION
-  1.3.0
+  1.4.0
   SYSTEM
   ON
   OPTIONS
   "PORT USER_DEFINED"
   # "MD5_ENABLED OFF" # Currently not working?!
+  "SERIAL_FLASHER_STUB_PULL_VERSION 1.1.0"
+  "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
 )
 cpmaddpackage(
   NAME

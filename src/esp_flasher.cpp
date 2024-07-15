@@ -231,7 +231,7 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
   // Try all ports and see if one opens and connects
   if (auto const connect_func{_no_stub == "no-stub"
                                 ? esp_loader_connect
-                                : esp_loader_connect_to_stub};
+                                : esp_loader_connect_with_stub};
       _port == "auto") {
     auto const port_infos{available_ports()};
     qInfo() << "Found" << port_infos.size() << "serial ports";
