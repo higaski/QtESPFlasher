@@ -163,7 +163,7 @@ esp_loader_error_t EspFlasher::changeBaudRate() {
         _no_stub == "no-stub"
           ? esp_loader_change_transmission_rate(_higher_baud)
           : esp_loader_change_transmission_rate_stub(
-              _higher_baud, _baud == "auto" ? _default_baud : _baud.toInt())};
+              _baud == "auto" ? _default_baud : _baud.toInt(), _higher_baud)};
       err != ESP_LOADER_SUCCESS)
     return err;
   if (auto const err{loader_port_change_transmission_rate(_higher_baud)};

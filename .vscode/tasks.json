@@ -14,12 +14,6 @@
       "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release"
     },
     {
-      "label": "CMake QtESPFlasher Release x86_64-w64-mingw32",
-      "type": "shell",
-      "isBackground": true,
-      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=CMakeModules/cmake/toolchain-x86_64-w64-mingw32-gcc.cmake"
-    },
-    {
       "label": "Ninja QtESPFlasher",
       "type": "shell",
       "isBackground": true,

@@ -420,13 +420,13 @@ cpmaddpackage(
   GITHUB_REPOSITORY
   "espressif/esp-serial-flasher"
   VERSION
-  1.4.0
+  1.4.1
   SYSTEM
   ON
   OPTIONS
   "PORT USER_DEFINED"
   # "MD5_ENABLED OFF" # Currently not working?!
-  "SERIAL_FLASHER_STUB_PULL_VERSION 1.1.0"
+  "SERIAL_FLASHER_STUB_PULL_VERSION 1.2.0"
   "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
 )
 cpmaddpackage(
