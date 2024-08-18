@@ -425,8 +425,8 @@ cpmaddpackage(
   ON
   OPTIONS
   "PORT USER_DEFINED"
-  # "MD5_ENABLED OFF" # Currently not working?!
-  "SERIAL_FLASHER_STUB_PULL_VERSION 1.2.0"
+  "MD5_ENABLED ON"
+  "SERIAL_FLASHER_STUB_PULL_VERSION 1.3.0"
   "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
 )
 cpmaddpackage(

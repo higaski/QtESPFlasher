@@ -344,12 +344,10 @@ esp_loader_error_t EspFlasher::flash(Bin const& bin) {
 #if MD5_ENABLED
   if (auto const err{esp_loader_flash_verify()};
       err == ESP_LOADER_ERROR_UNSUPPORTED_FUNC)
-    printf("ESP8266 does not support flash verify command.");
-  else if (err != ESP_LOADER_SUCCESS) {
-    printf("MD5 does not match. err: %d\n", err);
-    return err;
-  }
-  printf("Flash verified\n");
+    qCritical().noquote().nospace()
+      << "ESP8266 does not support flash verify command";
+  else if (err) return err;
+  else qInfo().nospace() << "Flash verified";
 #endif
 
   return ESP_LOADER_SUCCESS;
