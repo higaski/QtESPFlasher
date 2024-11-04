@@ -17,8 +17,6 @@
 #include <gsl/util>
 #include <magic_enum.hpp>
 #include <thread>
-#include "available_ports.hpp"
-#include "options.hpp"
 
 #if defined(Q_OS_LINUX)
 #  include <sys/ioctl.h>

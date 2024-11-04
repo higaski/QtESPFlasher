@@ -10,7 +10,7 @@
 
 #include "update_ports_event_filter.hpp"
 #include <QMouseEvent>
-#include "available_ports.hpp"
+#include <esp_flasher/available_ports.hpp>
 
 UpdatePortsEventFilter::UpdatePortsEventFilter(QWidget* parent)
   : QObject{parent} {}

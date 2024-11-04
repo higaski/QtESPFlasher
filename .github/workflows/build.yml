@@ -17,8 +17,8 @@ jobs:
           sudo apt install -y '^libxcb.*-dev' libglu1-mesa-dev libx11-xcb-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev ninja-build
       - run: cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release
         env:
-          CC:   gcc-10
-          CXX:  g++-10
+          CC: gcc-10
+          CXX: g++-10
       - run: cmake --build build --parallel --target QtESPFlasher
       - name: Find archive file
         run: |

@@ -1,6 +1,6 @@
 <img src="data/images/logo.png">
 
-[![build](https://github.com/higaski/QtESPFlasher/actions/workflows/build.yml/badge.svg)](https://github.com/higaski/QtESPFlasher/actions/workflows/build.yml)
+[![build](https://github.com/higaski/QtESPFlasher/actions/workflows/build.yml/badge.svg)](https://github.com/higaski/QtESPFlasher/actions/workflows/build.yml) [![license](https://img.shields.io/github/license/higaski/QtESPFlasher)](https://github.com/higaski/QtESPFlasher/raw/master/LICENSE)
 
 QtESPFlasher is CLI/GUI wrapper around [esp-serial-flasher](https://github.com/espressif/esp-serial-flasher), a portable C library for flashing of [Espressif](https://www.espressif.com/) SoCs.
 

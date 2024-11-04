@@ -16,7 +16,9 @@
 #include <QWidget>
 #include <array>
 #include <chrono>
+#include "available_ports.hpp"
 #include "bin.hpp"
+#include "options.hpp"
 
 /// QObject wrapped esp-serial-flasher
 ///

@@ -13,7 +13,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSerialPortInfo>
-#include "options.hpp"
 #include "update_ports_event_filter.hpp"
 
 /// Create layout of various dropdown menus and a start/stop button

@@ -15,8 +15,7 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QThread>
-#include "bin.hpp"
-#include "esp_flasher.hpp"
+#include <esp_flasher/esp_flasher.hpp>
 
 /// Bottom part GUI widget which displays serial port options
 ///

@@ -411,24 +411,9 @@ qt_add_resources(
   FILES
   data/images/logo.png)
 
-cpmaddpackage("gh:Neargye/magic_enum@0.9.5")
-cpmaddpackage("gh:microsoft/GSL@4.0.0")
+add_subdirectory(libs/esp_flasher)
+
 cpmaddpackage("gh:ZIMO-Elektronik/QtBreeze@5.115.0")
-cpmaddpackage(
-  NAME
-  esp-serial-flasher
-  GITHUB_REPOSITORY
-  "espressif/esp-serial-flasher"
-  VERSION
-  1.4.1
-  SYSTEM
-  ON
-  OPTIONS
-  "PORT USER_DEFINED"
-  # "MD5_ENABLED OFF" # Currently not working?!
-  "SERIAL_FLASHER_STUB_PULL_VERSION 1.2.0"
-  "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
-)
 cpmaddpackage(
   NAME
   quazip
@@ -445,14 +430,8 @@ cpmaddpackage(
 
 target_link_libraries(
   QtESPFlasher
-  PRIVATE flasher
-          magic_enum::magic_enum
-          Microsoft.GSL::GSL
-          Qt::BreezeStyleSheets
-          Qt::Core
-          Qt::SerialPort
-          Qt::Widgets
-          QuaZip::QuaZip
+  PUBLIC Qt::ESPFlasher
+  PRIVATE Qt::BreezeStyleSheets QuaZip::QuaZip
           -Wl,--gc-sections,-Map=QtESPFlasher.map)
 
 # Deploy release builds with CQtDeployer
@@ -535,7 +514,7 @@ endif()
 if(PROJECT_IS_TOP_LEVEL)
   file(
     DOWNLOAD
-    https://raw.githubusercontent.com/ZIMO-Elektronik/.clang-format/master/.clang-format
+    "https://github.com/ZIMO-Elektronik/.github/raw/master/data/.clang-format"
     ${CMAKE_CURRENT_LIST_DIR}/.clang-format)
   file(GLOB_RECURSE SRC src/*.*pp tests/*.*pp)
   add_clang_format_target(QtESPFlasherFormat OPTIONS -i FILES ${SRC})

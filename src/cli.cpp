@@ -11,11 +11,8 @@
 #include "cli.hpp"
 #include <QCommandLineParser>
 #include <QFileInfo>
+#include <esp_flasher/esp_flasher.hpp>
 #include <thread>
-#include "available_ports.hpp"
-#include "bin.hpp"
-#include "esp_flasher.hpp"
-#include "options.hpp"
 
 namespace {
 
