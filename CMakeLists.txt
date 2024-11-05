@@ -31,7 +31,7 @@ add_executable(QtESPFlasher WIN32 ${SRC})
 target_compile_definitions(QtESPFlasher
                            PRIVATE QTESPFLASHER_VERSION="${PROJECT_VERSION}")
 
-if(CMAKE_BUILD_TYPE STREQUAL Release)
+if(PROJECT_IS_TOP_LEVEL AND CMAKE_BUILD_TYPE STREQUAL Release)
   if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     build_qt(
       ${QT_VERSION}
@@ -413,20 +413,25 @@ qt_add_resources(
 
 add_subdirectory(libs/esp_flasher)
 
-cpmaddpackage("gh:ZIMO-Elektronik/QtBreeze@5.115.0")
-cpmaddpackage(
-  NAME
-  quazip
-  GITHUB_REPOSITORY
-  "stachenov/quazip"
-  VERSION
-  1.4
-  SYSTEM
-  ON
-  OPTIONS
-  "QUAZIP_QT_MAJOR_VERSION 6"
-  "QUAZIP_INSTALL OFF"
-  "QUAZIP_BZIP2 OFF")
+if(NOT TARGET Qt::BreezeStyleSheets)
+  cpmaddpackage("gh:ZIMO-Elektronik/QtBreeze@5.115.0")
+endif()
+
+if(NOT TARGET QuaZip::QuaZip)
+  cpmaddpackage(
+    NAME
+    quazip
+    GITHUB_REPOSITORY
+    "stachenov/quazip"
+    VERSION
+    1.4
+    SYSTEM
+    ON
+    OPTIONS
+    "QUAZIP_QT_MAJOR_VERSION 6"
+    "QUAZIP_INSTALL OFF"
+    "QUAZIP_BZIP2 OFF")
+endif()
 
 target_link_libraries(
   QtESPFlasher
@@ -435,7 +440,7 @@ target_link_libraries(
           -Wl,--gc-sections,-Map=QtESPFlasher.map)
 
 # Deploy release builds with CQtDeployer
-if(CMAKE_BUILD_TYPE STREQUAL Release)
+if(PROJECT_IS_TOP_LEVEL AND CMAKE_BUILD_TYPE STREQUAL Release)
   # Output directory of .zip files
   set(TARGET_DIR ${CMAKE_BINARY_DIR}/DistributionKit)
 

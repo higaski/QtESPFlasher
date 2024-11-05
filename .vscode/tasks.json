@@ -2,22 +2,22 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "CMake QtESPFlasher Debug",
+      "label": "Run act",
       "type": "shell",
       "isBackground": true,
-      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug"
+      "command": "act --artifact-server-path build"
     },
     {
-      "label": "CMake QtESPFlasher Release",
+      "label": "Run act x86_64-linux-gnu-gcc",
       "type": "shell",
       "isBackground": true,
-      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release"
+      "command": "act --artifact-server-path build -j x86_64-linux-gnu-gcc"
     },
     {
-      "label": "Ninja QtESPFlasher",
+      "label": "Run act x86_64-w64-mingw32-gcc",
       "type": "shell",
       "isBackground": true,
-      "command": "ninja -C build QtESPFlasher"
+      "command": "act --artifact-server-path build -j x86_64-w64-mingw32-gcc"
     },
     {
       "label": "Run QtESPFlasher",
@@ -30,24 +30,6 @@
       "type": "shell",
       "isBackground": true,
       "command": "valgrind --error-exitcode=1 --leak-check=yes --errors-for-leak-kinds=definite,indirect ./build/QtESPFlasher"
-    },
-    {
-      "label": "act x86_64-linux-gnu-gcc",
-      "type": "shell",
-      "isBackground": true,
-      "command": "act --artifact-server-path build -j x86_64-linux-gnu-gcc"
-    },
-    {
-      "label": "act x86_64-w64-mingw32-gcc",
-      "type": "shell",
-      "isBackground": true,
-      "command": "act --artifact-server-path build -j x86_64-w64-mingw32-gcc"
-    },
-    {
-      "label": "act",
-      "type": "shell",
-      "isBackground": true,
-      "command": "act --artifact-server-path build"
     }
   ]
 }

@@ -2,14 +2,12 @@ file(GLOB_RECURSE SRC include/*.hpp src/*.cpp)
 add_library(ESPFlasher ${SRC})
 add_library(Qt::ESPFlasher ALIAS ESPFlasher)
 
-target_compile_features(ESPFlasher PUBLIC cxx_std_23)
+target_compile_features(ESPFlasher PUBLIC cxx_std_20)
 
 target_include_directories(
   ESPFlasher SYSTEM
   INTERFACE include
   PRIVATE include/esp_flasher)
-
-target_common_warnings(ESPFlasher PRIVATE)
 
 if(NOT TARGET flasher)
   cpmaddpackage(
