@@ -43,6 +43,7 @@ It currently supports the following ESP microcontrollers:
   - a .zip archive
   - single/multiple loose binaries
 - CLI is a drop-in replace for [esptools write-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#write-binary-data-to-flash-write-flash) command
+- `ESPFlasher` [Qt widget library](/libs/esp_flasher) for reuse
 - Pre-built Windows and Linux executables
 
 ## Options

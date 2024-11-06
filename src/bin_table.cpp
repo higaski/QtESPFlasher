@@ -58,14 +58,14 @@ void BinTable::addDirectory() {
 void BinTable::addFiles() {
   auto const paths{QFileDialog::getOpenFileNames(
     this,
-    "Add binaries, JSON or archive",
+    "Add binaries, JSON or zip archive",
     "",
-    "Binaries, JSON or archive (*.bin *.json *.zip)",
+    "Binaries, JSON or zip archive (*.bin *.json *.zip)",
     nullptr,
     QFileDialog::DontUseCustomDirectoryIcons)};
   std::ranges::for_each(paths, [&](auto path) {
     if (QFileInfo const file_info{path}; !file_info.exists()) return;
-    else if (auto const suffix{file_info.completeSuffix()}; suffix == "bin")
+    else if (auto const suffix{file_info.suffix()}; suffix == "bin")
       addBin(path);
     else if (suffix == "json") addJson(path);
     else addAr(path);
