@@ -232,7 +232,8 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
                                 : esp_loader_connect_with_stub};
       _port == "auto") {
     auto const port_infos{available_ports()};
-    qInfo() << "Found" << port_infos.size() << "serial ports";
+    qInfo() << "Found" << port_infos.size() << "serial"
+            << (port_infos.size() > 1 || !port_infos.size() ? "ports" : "port");
     for (auto const& port_info : port_infos) {
       ESP_RETURN_ON_INTERRUPTION_REQUESTED();
       qInfo().noquote() << "Connecting to" << port_info.portName();
