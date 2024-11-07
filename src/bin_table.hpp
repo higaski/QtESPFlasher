@@ -11,7 +11,7 @@
 #pragma once
 
 #include <QTableWidget>
-#include "bin.hpp"
+#include <esp_flasher/bin.hpp>
 
 /// Table of binary paths and offsets
 ///

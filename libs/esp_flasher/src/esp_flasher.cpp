@@ -17,8 +17,6 @@
 #include <gsl/util>
 #include <magic_enum.hpp>
 #include <thread>
-#include "available_ports.hpp"
-#include "options.hpp"
 
 #if defined(Q_OS_LINUX)
 #  include <sys/ioctl.h>
@@ -163,7 +161,7 @@ esp_loader_error_t EspFlasher::changeBaudRate() {
         _no_stub == "no-stub"
           ? esp_loader_change_transmission_rate(_higher_baud)
           : esp_loader_change_transmission_rate_stub(
-              _higher_baud, _baud == "auto" ? _default_baud : _baud.toInt())};
+              _baud == "auto" ? _default_baud : _baud.toInt(), _higher_baud)};
       err != ESP_LOADER_SUCCESS)
     return err;
   if (auto const err{loader_port_change_transmission_rate(_higher_baud)};
@@ -231,10 +229,11 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
   // Try all ports and see if one opens and connects
   if (auto const connect_func{_no_stub == "no-stub"
                                 ? esp_loader_connect
-                                : esp_loader_connect_to_stub};
+                                : esp_loader_connect_with_stub};
       _port == "auto") {
     auto const port_infos{available_ports()};
-    qInfo() << "Found" << port_infos.size() << "serial ports";
+    qInfo() << "Found" << port_infos.size() << "serial"
+            << (port_infos.size() > 1 || !port_infos.size() ? "ports" : "port");
     for (auto const& port_info : port_infos) {
       ESP_RETURN_ON_INTERRUPTION_REQUESTED();
       qInfo().noquote() << "Connecting to" << port_info.portName();

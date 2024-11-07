@@ -4,8 +4,8 @@ include(FetchContent)
 
 FetchContent_Declare(
   CMakeModules
-  GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.8.0
+  GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
+  GIT_TAG v0.9.3
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -31,7 +31,7 @@ add_executable(QtESPFlasher WIN32 ${SRC})
 target_compile_definitions(QtESPFlasher
                            PRIVATE QTESPFLASHER_VERSION="${PROJECT_VERSION}")
 
-if(CMAKE_BUILD_TYPE STREQUAL Release)
+if(PROJECT_IS_TOP_LEVEL AND CMAKE_BUILD_TYPE STREQUAL Release)
   if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     build_qt(
       ${QT_VERSION}
@@ -393,7 +393,17 @@ find_qt(REQUIRED COMPONENTS Core SerialPort Widgets)
 
 qt_add_resources(
   QtESPFlasher
-  logo
+  qtespflasher_fonts
+  PREFIX
+  fonts
+  BASE
+  data/fonts
+  FILES
+  data/fonts/DejaVuSansMono.ttf)
+
+qt_add_resources(
+  QtESPFlasher
+  qtespflasher_images
   PREFIX
   images
   BASE
@@ -401,75 +411,38 @@ qt_add_resources(
   FILES
   data/images/logo.png)
 
-cpmaddpackage("gh:Neargye/magic_enum@0.9.5")
-cpmaddpackage("gh:microsoft/GSL@4.0.0")
-cpmaddpackage("gh:ZIMO-Elektronik/QtBreeze@5.115.0")
-cpmaddpackage(
-  NAME
-  esp-serial-flasher
-  GITHUB_REPOSITORY
-  "higaski/esp-serial-flasher"
-  GIT_TAG
-  # TODO actual tag once #103 got merged
-  # https://github.com/espressif/esp-serial-flasher/pull/103
-  928dd73850c2c2cd689ecdeb854afe7b2b159622
-  VERSION
-  1.3.0
-  SYSTEM
-  ON
-  OPTIONS
-  "PORT USER_DEFINED"
-  # "MD5_ENABLED OFF" # Currently not working?!
-)
-cpmaddpackage(
-  NAME
-  quazip
-  GITHUB_REPOSITORY
-  "stachenov/quazip"
-  VERSION
-  1.4
-  SYSTEM
-  ON
-  OPTIONS
-  "QUAZIP_QT_MAJOR_VERSION 6"
-  "QUAZIP_INSTALL OFF"
-  "QUAZIP_BZIP2 OFF")
+add_subdirectory(libs/esp_flasher)
+
+if(NOT TARGET Qt::BreezeStyleSheets)
+  cpmaddpackage("gh:ZIMO-Elektronik/QtBreeze@5.115.0")
+endif()
+
+if(NOT TARGET QuaZip::QuaZip)
+  cpmaddpackage(
+    NAME
+    quazip
+    GITHUB_REPOSITORY
+    "stachenov/quazip"
+    VERSION
+    1.4
+    SYSTEM
+    ON
+    OPTIONS
+    "QUAZIP_QT_MAJOR_VERSION 6"
+    "QUAZIP_INSTALL OFF"
+    "QUAZIP_BZIP2 OFF")
+endif()
 
 target_link_libraries(
   QtESPFlasher
-  PRIVATE flasher
-          magic_enum::magic_enum
-          Microsoft.GSL::GSL
-          Qt::BreezeStyleSheets
-          Qt::Core
-          Qt::SerialPort
-          Qt::Widgets
-          QuaZip::QuaZip
+  PUBLIC Qt::ESPFlasher
+  PRIVATE Qt::BreezeStyleSheets QuaZip::QuaZip
           -Wl,--gc-sections,-Map=QtESPFlasher.map)
 
 # Deploy release builds with CQtDeployer
-if(CMAKE_BUILD_TYPE STREQUAL Release)
+if(PROJECT_IS_TOP_LEVEL AND CMAKE_BUILD_TYPE STREQUAL Release)
   # Output directory of .zip files
   set(TARGET_DIR ${CMAKE_BINARY_DIR}/DistributionKit)
-
-  # Qt6 does not ship with fonts and we have built without fontconfig, so get a
-  # free font and copy it
-  cpmaddpackage(
-    NAME
-    dejavu-fonts
-    URL
-    "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip"
-    VERSION
-    2.37
-    DOWNLOAD_ONLY
-    TRUE)
-  add_custom_command(
-    TARGET QtESPFlasher
-    POST_BUILD
-    COMMAND
-      ${CMAKE_COMMAND} -E copy
-      ${dejavu-fonts_SOURCE_DIR}/ttf/DejaVuSansMono.ttf
-      ${TARGET_DIR}/lib/fonts/DejaVuSansMono.ttf)
 
   if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     # Get an old version of CQtDeployer compatible with GLIB 2.31
@@ -495,7 +468,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
       POST_BUILD
       COMMAND
         ${CQTDEPLOYER_EXECUTABLE} #
-        clear #
+        force-clear #
         noTranslations #
         -bin $<TARGET_FILE:QtESPFlasher> #
         -qmake ${QMAKE_EXECUTABLE} #
@@ -521,7 +494,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
       POST_BUILD
       COMMAND
         ${CQTDEPLOYER_EXECUTABLE} #
-        clear #
+        force-clear #
         noTranslations #
         -bin $<TARGET_FILE:QtESPFlasher> #
         -qmake ${QMAKE_EXECUTABLE} #
@@ -546,7 +519,7 @@ endif()
 if(PROJECT_IS_TOP_LEVEL)
   file(
     DOWNLOAD
-    https://raw.githubusercontent.com/ZIMO-Elektronik/.clang-format/master/.clang-format
+    "https://github.com/ZIMO-Elektronik/.github/raw/master/data/.clang-format"
     ${CMAKE_CURRENT_LIST_DIR}/.clang-format)
   file(GLOB_RECURSE SRC src/*.*pp tests/*.*pp)
   add_clang_format_target(QtESPFlasherFormat OPTIONS -i FILES ${SRC})

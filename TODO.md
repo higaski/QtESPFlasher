@@ -1,1 +1,2 @@
-- Erase flash?
+- Verify
+- Erase flash
