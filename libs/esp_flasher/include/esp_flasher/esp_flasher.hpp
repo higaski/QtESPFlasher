@@ -91,7 +91,7 @@ private:
   static constexpr int _default_baud{115200};
   static constexpr int _higher_baud{460800};
 
-  // ESP32R0 hard way longer times (1300u / 450u)?
+  // ESP32R0 has way longer times (1300u / 450u)?
   // Might need to make them changeable
   static_assert(SERIAL_FLASHER_RESET_HOLD_TIME_MS == 100);
   static_assert(SERIAL_FLASHER_BOOT_HOLD_TIME_MS == 50);

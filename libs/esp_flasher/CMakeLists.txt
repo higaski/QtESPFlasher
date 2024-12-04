@@ -16,19 +16,19 @@ if(NOT TARGET flasher)
     GITHUB_REPOSITORY
     "espressif/esp-serial-flasher"
     VERSION
-    1.4.1
+    1.7.0
     SYSTEM
     ON
     OPTIONS
     "PORT USER_DEFINED"
     # "MD5_ENABLED OFF" # Currently not working?!
-    "SERIAL_FLASHER_STUB_PULL_VERSION 1.2.0"
+    "SERIAL_FLASHER_STUB_PULL_VERSION 1.3.0"
     "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
   )
 endif()
 
 if(NOT TARGET magic_enum)
-  cpmaddpackage("gh:Neargye/magic_enum@0.9.6")
+  cpmaddpackage("gh:Neargye/magic_enum@0.9.7")
 endif()
 
 if(NOT TARGET Microsoft.GSL::GSL)

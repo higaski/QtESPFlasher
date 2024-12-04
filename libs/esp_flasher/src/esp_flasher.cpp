@@ -15,7 +15,7 @@
 #include <QThread>
 #include <algorithm>
 #include <gsl/util>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <thread>
 
 #if defined(Q_OS_LINUX)
