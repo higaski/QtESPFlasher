@@ -42,7 +42,7 @@ auto make_tramp(F&& f) {
   }(std::make_index_sequence<std::tuple_size_v<Args>>{});
 }
 
-}  // namespace
+} // namespace
 
 /// Singleton pattern
 MessageHandler* MessageHandler::get() {

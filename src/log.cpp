@@ -38,10 +38,10 @@ void Log::messageHandler(QtMsgType type,
 void Log::contextMenuEvent(QContextMenuEvent* event) {
   auto menu{createStandardContextMenu()};
   auto const actions{menu->actions()};
-  menu->removeAction(actions[0u]);  // Undo
-  menu->removeAction(actions[1u]);  // Redo
-  menu->removeAction(actions[2u]);  // Separator
-  menu->removeAction(actions[5u]);  // Paste
+  menu->removeAction(actions[0u]); // Undo
+  menu->removeAction(actions[1u]); // Redo
+  menu->removeAction(actions[2u]); // Separator
+  menu->removeAction(actions[5u]); // Paste
   menu->exec(event->globalPos());
   delete menu;
 }

@@ -21,10 +21,12 @@ int gui(QApplication& app) {
   // Initialize resources
   Q_INIT_RESOURCE(qtbreeze_stylesheets);
 
-  // Default to monospace font
-  QFontDatabase::addApplicationFont(":/fonts/DejaVuSansMono.ttf");
+  /// \bug Adding DejaVuSansMono does not work on Windows
+  if (QFontDatabase::addApplicationFont(":/fonts/DejaVuSansMono.ttf") == -1)
+    return -1;
   QFont font{"DejaVuSansMono"};
   font.setPointSize(10);
+  font.setStyleHint(QFont::Monospace);
   app.setFont(font);
 
   // Apply breeze stylesheet

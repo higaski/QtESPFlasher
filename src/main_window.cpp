@@ -70,8 +70,8 @@ void MainWindow::about() {
   about.setWindowTitle("About " + QCoreApplication::applicationName());
   about.setTextFormat(Qt::RichText);
   about.setDetailedText("@Version\n" + QCoreApplication::applicationVersion() +
-                        "\n\n" +       //
-                        "@GitHub\n" +  //
+                        "\n\n" +      //
+                        "@GitHub\n" + //
                         "github.com/higaski/QtESPFlasher");
   about.setStandardButtons(QMessageBox::Ok);
   about.setIconPixmap(QPixmap{":/images/logo.png"});

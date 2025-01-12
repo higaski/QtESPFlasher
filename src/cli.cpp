@@ -107,7 +107,7 @@ int write_flash(QCommandLineParser const& parser) {
   return esp_flasher.flash();
 }
 
-}  // namespace
+} // namespace
 
 /// Run CLI
 ///
@@ -133,7 +133,7 @@ int cli(QApplication const& app) {
      "Disable launching the flasher stub, only talk to ROM bootloader"},
     {{"t", "trace"}, "Enable trace-level output of QtESPFlasher interactions"},
     {{"l", "list"},
-     "List all available serial interfaces"},  // From STM32CubeProgrammer
+     "List all available serial interfaces"}, // From STM32CubeProgrammer
   });
 
   // Add commands

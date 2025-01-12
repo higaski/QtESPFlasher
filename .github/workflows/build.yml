@@ -8,7 +8,7 @@ jobs:
   x86_64-linux-gnu-gcc:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: Install prerequisites
@@ -32,7 +32,7 @@ jobs:
   x86_64-w64-mingw32-gcc:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: Install prerequisites

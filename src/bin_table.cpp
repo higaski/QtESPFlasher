@@ -77,7 +77,7 @@ void BinTable::removeFiles() {
   for (int r{}; r < rowCount();) {
     if (item(r, 0)->checkState()) {
       removeRow(r);
-      r = 0;  // Start over, rowCount changed
+      r = 0; // Start over, rowCount changed
     } else ++r;
   }
 
