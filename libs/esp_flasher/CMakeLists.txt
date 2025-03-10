@@ -16,7 +16,7 @@ if(NOT TARGET flasher)
     GITHUB_REPOSITORY
     "espressif/esp-serial-flasher"
     VERSION
-    1.7.0
+    1.8.0
     SYSTEM
     ON
     OPTIONS
@@ -32,7 +32,7 @@ if(NOT TARGET magic_enum)
 endif()
 
 if(NOT TARGET Microsoft.GSL::GSL)
-  cpmaddpackage("gh:microsoft/GSL@4.1.0")
+  cpmaddpackage("gh:microsoft/GSL@4.2.0")
 endif()
 
 target_link_libraries(
