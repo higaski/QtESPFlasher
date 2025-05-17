@@ -22,7 +22,7 @@ if(NOT TARGET flasher)
     OPTIONS
     "PORT USER_DEFINED"
     # "MD5_ENABLED OFF" # Currently not working?!
-    "SERIAL_FLASHER_STUB_PULL_VERSION 1.4.0"
+    "SERIAL_FLASHER_STUB_PULL_VERSION 1.5.1"
     "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
   )
 endif()
