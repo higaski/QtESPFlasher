@@ -3,10 +3,12 @@ name: build
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   x86_64-linux-gnu-gcc:
     runs-on: ubuntu-20.04
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -24,13 +26,14 @@ jobs:
         run: |
           echo "ARTIFACT_NAME=$(find build -type f -name "QtESPFlasher-*.zip" -printf "%f\n")" >> $GITHUB_ENV
           echo "ARTIFACT_PATH=$(find build -type f -name "QtESPFlasher-*.zip")" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4.3.3
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ARTIFACT_PATH }}
 
   x86_64-w64-mingw32-gcc:
     runs-on: ubuntu-24.04
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -39,14 +42,14 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y libz-mingw-w64 libz-mingw-w64-dev mingw-w64 ninja-build
-          sudo pip install aqtinstall --break-system-packages
+          sudo pip install aqtinstall --break-system-packages --ignore-installed
       - run: cmake --preset "Release x86_64-w64-mingw32-gcc"
       - run: cmake --build build --parallel --target QtESPFlasher
       - name: Find archive file
         run: |
           echo "ARTIFACT_NAME=$(find build -type f -name "QtESPFlasher-*.zip" -printf "%f\n")" >> $GITHUB_ENV
           echo "ARTIFACT_PATH=$(find build -type f -name "QtESPFlasher-*.zip")" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4.3.3
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ARTIFACT_PATH }}
