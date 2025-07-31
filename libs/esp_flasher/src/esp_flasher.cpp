@@ -61,7 +61,7 @@ constexpr size_t align(size_t alignment, size_t value) {
   return value + (alignment - value % alignment) % alignment;
 }
 
-}  // namespace
+} // namespace
 
 /// Create EspFlasher
 ///
@@ -263,9 +263,7 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
 
   // Target supported
   auto const target{esp_loader_get_target()};
-  if (target >= ESP_UNKNOWN_CHIP ||
-      target == ESP32_RESERVED0_CHIP)  // TODO remove this one day?
-  {
+  if (target >= ESP_UNKNOWN_CHIP) {
     qCritical().noquote() << "Unknown chip";
     return ESP_LOADER_ERROR_UNSUPPORTED_CHIP;
   }
@@ -510,7 +508,7 @@ void EspFlasher::transfer_debug_print(uint8_t const* data,
   static auto const log_path{
     QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
   static auto fd{fopen(log_path.c_str(), "w")};
-  static gsl::final_action close{[&fd] { fclose(fd); }};
+  static gsl::final_action close{[] { fclose(fd); }};
 
   static bool write_prev{};
 

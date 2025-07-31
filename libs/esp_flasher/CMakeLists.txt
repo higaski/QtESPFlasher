@@ -16,13 +16,13 @@ if(NOT TARGET flasher)
     GITHUB_REPOSITORY
     "espressif/esp-serial-flasher"
     VERSION
-    1.8.0
+    1.9.0
     SYSTEM
     ON
     OPTIONS
     "PORT USER_DEFINED"
     # "MD5_ENABLED OFF" # Currently not working?!
-    "SERIAL_FLASHER_STUB_PULL_VERSION 1.5.1"
+    "SERIAL_FLASHER_STUB_PULL_VERSION 1.6.0"
     "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
   )
 endif()

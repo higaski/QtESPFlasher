@@ -22,6 +22,7 @@ inline constexpr std::array chips{"esp8266",
                                   "esp32h4",
                                   "esp32h2",
                                   "esp32c6",
+                                  "esp32p4",
                                   "auto"};
 
 /// Supported --before options
