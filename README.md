@@ -7,12 +7,14 @@ QtESPFlasher is CLI/GUI wrapper around [esp-serial-flasher](https://github.com/e
 It currently supports the following ESP microcontrollers:
 - [ESP8266](https://www.espressif.com/en/products/socs/esp8266)
 - [ESP32](https://www.espressif.com/en/products/socs/esp32)
-- [ESP32S2](https://www.espressif.com/en/products/socs/esp32-s2)
-- [ESP32C3](https://www.espressif.com/en/products/socs/esp32-c3)
-- [ESP32S3](https://www.espressif.com/en/products/socs/esp32-s3)
-- [ESP32C2](https://www.espressif.com/en/products/socs/esp32-c2)
-- [ESP32H2](https://www.espressif.com/en/products/socs/esp32-h2)
-- [ESP32C6](https://www.espressif.com/en/products/socs/esp32-c6)
+- [ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2)
+- [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3)
+- [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)
+- [ESP32-C2](https://www.espressif.com/en/products/socs/esp32-c2)
+- [ESP32-C5](https://www.espressif.com/en/products/socs/esp32-c5)
+- [ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2)
+- [ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6)
+- [ESP32-P4](https://www.espressif.com/en/products/socs/esp32-p4)
 
 <details>
   <summary>Table of Contents</summary>

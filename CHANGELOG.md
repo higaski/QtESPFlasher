@@ -1,7 +1,8 @@
 # Changelog
 
 ## 0.1.0
-- Add support for ESP32-P4
+- Add ESP32-P4 support
+- Add ESP32-C5 support (without stub)
 
 ## 0.0.1
 - Bugfix allow dots in binary file names
