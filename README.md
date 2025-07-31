@@ -132,13 +132,13 @@ Done
 QtESPFlasher offers a few different ways to select binaries for flashing.
 
 #### Add Directory
-The build directory of an ESP-IDF project can be selected directly using the ![folder open](data/icons/folder_open.png) symbol. ESP-IDF builds generate a file called flasher_args.json which contains project flash information in JSON format. This file is red by QtESPFlasher to obtain all of the projects binaries and their offsets.  
+The build directory of an ESP-IDF project can be selected directly using the ![folder open](data/icons/folder_open.png) symbol. ESP-IDF builds generate a file called `flasher_args.json` which contains project flash information in JSON format. This file is red by QtESPFlasher to obtain all of the projects binaries and their offsets.  
 ![usage add dir](data/images/usage_add_dir.gif)
 
 #### Add .zip Archive
-A zipped ESP-IDF build directory can also be selected directly using the ![file](data/icons/file.png) symbol. The .zip file must contain a flasher_args.json file, just like when adding a directory.  
+A zipped ESP-IDF build directory can also be selected directly using the ![file](data/icons/file.png) symbol. The .zip file must contain a `flasher_args.json` file, just like when adding a directory.  
 ![usage add zip](data/images/usage_add_zip.gif)
 
 #### Add Binaries
-If there is no flasher_args.json file available, binaries can also be added directly. This is done by selecting .bin files with the ![file](data/icons/file.png) symbol. Please note that in this case the offset must be entered **manually**. Offsets in the C language convention, such as “0x” for base 16 or “0b” for base 2, are supported.  
+If there is no `flasher_args.json` file available, binaries can also be added directly. This is done by selecting .bin files with the ![file](data/icons/file.png) symbol. Please note that in this case the offset must be entered **manually**. Offsets in the C language convention, such as `0x` for base 16 or `0b` for base 2, are supported.  
 ![usage add bin](data/images/usage_add_bin.gif)
