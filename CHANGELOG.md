@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.1
+- Bugfix ESP32-C5 erase during flashing above 16MB
+
 ## 0.1.0
 - Add ESP32-P4 support
 - Add ESP32-C5 support (without stub)
