@@ -3,14 +3,16 @@ name: build
 on:
   push:
     branches: [master]
+  workflow_call:
   workflow_dispatch:
 
 jobs:
+  # No longer works on GitHub because ubuntu-20.04 has been removed
   x86_64-linux-gnu-gcc:
     runs-on: ubuntu-20.04
     if: github.event_name == 'workflow_dispatch'
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
       - name: Install prerequisites
@@ -33,9 +35,8 @@ jobs:
 
   x86_64-w64-mingw32-gcc:
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push'
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
       - name: Install prerequisites
