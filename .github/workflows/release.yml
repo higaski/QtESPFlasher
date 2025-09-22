@@ -18,10 +18,10 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v5.0.0
         with:
-          path: ./artifacts
+          path: artifacts
       - name: Find archive files
         run: |
-          ARTIFACTS=$(find ./artifacts -type f -name '*.zip')
+          ARTIFACTS=$(find artifacts -type f -name '*.zip')
           [ -z "$ARTIFACTS" ] && exit 1
           echo "ARTIFACT_FILES<<EOF" >> $GITHUB_ENV
           printf "%s\n" "$ARTIFACTS" >> $GITHUB_ENV
