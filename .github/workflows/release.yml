@@ -31,11 +31,11 @@ jobs:
       - name: Release notes from CHANGELOG.md
         run: |
           TAG=${GITHUB_REF#refs/tags/}
-          TAG_NO_V=${TAG#v}
-          NOTES=$(awk -v tag="## $TAG_NO_V" '
-            $0 ~ tag {flag=1; next} 
-            /^## / {flag=0} 
-            flag && /^- / {print}
+          VERSION=$(echo "$TAG" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          NOTES=$(awk -v version="$VERSION" '
+            $0 ~ "^##[[:space:]]+v?" version "$" { in_section=1; next }
+            in_section && /^##[[:space:]]/ { exit }
+            in_section && /^[[:space:]]*-/ { print $0 }
           ' CHANGELOG.md)
           [ -z "$NOTES" ] && exit 1
           {
