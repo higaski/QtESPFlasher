@@ -17,15 +17,20 @@
 
 /// Create layout of various dropdown menus and a start/stop button
 ComBox::ComBox(QWidget* parent) : QGroupBox{parent} {
-  // Start/stop button
+  // Flash button
   QPixmap pixmap_off{":/dark/play.svg"};
   QPixmap pixmap_on{":/dark/stop.svg"};
   QIcon ico;
   ico.addPixmap(pixmap_off, QIcon::Normal, QIcon::Off);
   ico.addPixmap(pixmap_on, QIcon::Normal, QIcon::On);
-  _start_stop_button->setIcon(ico);
-  _start_stop_button->setText("Start");
-  _start_stop_button->setCheckable(true);
+  _flash_button->setIcon(ico);
+  _flash_button->setText("Flash");
+  _flash_button->setCheckable(true);
+
+  // Erase button
+  _erase_button->setIcon(ico);
+  _erase_button->setText("Erase");
+  _erase_button->setCheckable(true);
 
   // Add before/after options
   for (auto const& before : befores) _before_combobox->addItem(before);
@@ -69,7 +74,8 @@ ComBox::ComBox(QWidget* parent) : QGroupBox{parent} {
   // Workaround: top margin must be zero for the layout to be vertically
   // centered
   layout->setContentsMargins(11, 0, 11, 11);
-  layout->addWidget(_start_stop_button, 0, 0);
+  layout->addWidget(_flash_button, 0, 0);
+  layout->addWidget(_erase_button, 1, 0);
   layout->addWidget(new QLabel{"Before"}, 0, 1, Qt::AlignRight);
   layout->addWidget(new QLabel{"After"}, 1, 1, Qt::AlignRight);
   layout->addWidget(_before_combobox, 0, 2);
@@ -84,10 +90,10 @@ ComBox::ComBox(QWidget* parent) : QGroupBox{parent} {
   layout->addWidget(_baud_combobox, 2, 4);
   setLayout(layout);
 
-  connect(_start_stop_button,
-          &QPushButton::clicked,
-          this,
-          &ComBox::startStopButtonClicked);
+  connect(
+    _flash_button, &QPushButton::clicked, this, &ComBox::flashButtonClicked);
+  connect(
+    _erase_button, &QPushButton::clicked, this, &ComBox::eraseButtonClicked);
 }
 
 /// Set binaries slot
@@ -95,13 +101,32 @@ ComBox::ComBox(QWidget* parent) : QGroupBox{parent} {
 /// \param  bins  Binaries
 void ComBox::binaries(QVector<Bin> bins) { _bins = bins; }
 
-/// Start/stop button slot
+/// Flash slot
 ///
-/// \param  start
-void ComBox::startStopButtonClicked(bool start) {
+/// \param  start Start or stop flashing
+void ComBox::flashButtonClicked(bool start) {
+  buttonClicked(start, _flash_button, &EspFlasher::flash);
+}
+
+/// Erase slot
+///
+/// \param  start Start or stop erasing
+void ComBox::eraseButtonClicked(bool start) {
+  buttonClicked(start, _erase_button, &EspFlasher::erase);
+}
+
+/// Flash or erase slot
+///
+/// \param  start   Start or stop action
+/// \param  button  Button used
+/// \param  action  Action to start or stop
+void ComBox::buttonClicked(bool start,
+                           QPushButton* button,
+                           esp_loader_error_t (EspFlasher::*action)()) {
   // Start thread
   if (start) {
-    _start_stop_button->setText("Stop");
+    auto text{button->text()};
+    button->setText("Stop");
 
     QString const chip{_chip_combobox->currentText()};
     QString const port{_port_combobox->currentText()};
@@ -119,10 +144,7 @@ void ComBox::startStopButtonClicked(bool start) {
     _esp_flasher->moveToThread(_thread);
 
     // Thread starts loader
-    connect(_thread,
-            &QThread::started,
-            _esp_flasher,
-            qOverload<>(&EspFlasher::flash));
+    connect(_thread, &QThread::started, _esp_flasher, action);
 
     // When loader finishes, quit thread and delete loader
     connect(_esp_flasher, &EspFlasher::finished, _thread, &QThread::quit);
@@ -135,9 +157,9 @@ void ComBox::startStopButtonClicked(bool start) {
     connect(_thread, &QThread::finished, _thread, &QThread::deleteLater);
 
     // Once thread is destroyed, reset button
-    connect(_thread, &QThread::destroyed, [this] {
-      _start_stop_button->setChecked(false);
-      _start_stop_button->setText("Start");
+    connect(_thread, &QThread::destroyed, [this, button, text] {
+      button->setChecked(false);
+      button->setText(text);
     });
 
     _thread->start();

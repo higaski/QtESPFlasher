@@ -44,7 +44,7 @@ It currently supports the following ESP microcontrollers:
   - a [flasher_args.json](https://github.com/espressif/esp-idf/blob/master/components/esptool_py/flasher_args.json.in) file
   - a .zip archive
   - single/multiple loose binaries
-- CLI is a drop-in replace for [esptools write-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#write-binary-data-to-flash-write-flash) command
+- CLI is a drop-in replacement for the [write-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#write-binary-data-to-flash-write-flash) and [erase-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#erase-flash-erase-flash-erase-region) commands of [esptool](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/index.html)
 - `ESPFlasher` [Qt widget library](/libs/esp_flasher) for reuse
 - Pre-built Windows and Linux executables
 
@@ -94,7 +94,7 @@ The default QtESPFlasher baud rate is 115200. Slower rates may be set using `-b`
 
 ## Usage
 ### CLI
-When used as a command line tool QtESPFlasher can be a drop-in replace for the [esptools write-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#write-binary-data-to-flash-write-flash) command.
+When used as a command line tool QtESPFlasher can be a drop-in replacement for [write-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#write-binary-data-to-flash-write-flash) and [erase-flash](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html#erase-flash-erase-flash-erase-region).
 
 ```sh
 ./QtESPFlasher -p ttyUSB0 write_flash 0x0 bootloader/bootloader.bin 0x10000 hello_world.bin

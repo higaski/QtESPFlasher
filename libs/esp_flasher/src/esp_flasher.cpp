@@ -111,7 +111,7 @@ EspFlasher::~EspFlasher() {
 ///
 /// \retval ESP_LOADER_SUCCESS              Success
 /// \retval ESP_LOADER_ERROR_FAIL           Unspecified error
-/// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout elapsed
+/// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout
 /// \retval ESP_LOADER_ERROR_INVALID_PARAM  Invalid parameter
 /// \retval ESP_LOADER_ERROR_INVALID_TARGET Connected target is invalid
 esp_loader_error_t EspFlasher::flash() {
@@ -139,6 +139,38 @@ esp_loader_error_t EspFlasher::flash() {
         << "Flash failed (" << qstrerr(err) << ")";
       return err;
     }
+
+  if (_after == "hard_reset") {
+    qInfo().noquote() << "Hard resetting via RTS pin...";
+    loader_port_reset_target();
+  }
+
+  qInfo().noquote() << "Done";
+
+  return ESP_LOADER_SUCCESS;
+}
+
+/// Erase
+///
+/// \retval ESP_LOADER_SUCCESS                Success
+/// \retval ESP_LOADER_ERROR_TIMEOUT          Timeout
+/// \retval ESP_LOADER_ERROR_INVALID_RESPONSE Internal error
+esp_loader_error_t EspFlasher::erase() {
+  gsl::final_action emit_finished{[this] { emit finished(); }};
+
+  // Try to connect
+  if (auto const err{connect()}; err != ESP_LOADER_SUCCESS) {
+    qCritical().noquote().nospace()
+      << "Cannot connect to target (" << qstrerr(err) << ")";
+    return err;
+  }
+
+  // Erase
+  qInfo().nospace() << "Erasing flash (this may take a while)...";
+  if (auto const err{esp_loader_flash_erase()}; err != ESP_LOADER_SUCCESS) {
+    qCritical().noquote().nospace() << "Erase failed (" << qstrerr(err) << ")";
+    return err;
+  }
 
   if (_after == "hard_reset") {
     qInfo().noquote() << "Hard resetting via RTS pin...";
@@ -219,7 +251,7 @@ QSerialPort::SerialPortError EspFlasher::open(QString port, QString baud) {
 /// \param  connect_config                  Timing parameters
 /// \retval ESP_LOADER_SUCCESS              Success
 /// \retval ESP_LOADER_ERROR_FAIL           Unspecified error
-/// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout elapsed
+/// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout
 /// \retval ESP_LOADER_ERROR_INVALID_PARAM  Invalid parameter
 /// \retval ESP_LOADER_ERROR_INVALID_TARGET Connected target is invalid
 esp_loader_error_t
@@ -290,7 +322,7 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
 /// \param  bin                             Binary
 /// \retval ESP_LOADER_SUCCESS              Success
 /// \retval ESP_LOADER_ERROR_FAIL           Unspecified error
-/// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout elapsed
+/// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout
 /// \retval ESP_LOADER_ERROR_INVALID_PARAM  Invalid parameter
 esp_loader_error_t EspFlasher::flash(Bin const& bin) {
   constexpr uint32_t block_size{1024u};
@@ -358,7 +390,7 @@ esp_loader_error_t EspFlasher::flash(Bin const& bin) {
 /// \param  size                      Number of bytes to read
 /// \param  timeout                   Timeout in milliseconds
 /// \retval ESP_LOADER_SUCCESS        Success
-/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout elapsed
+/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout
 esp_loader_error_t
 EspFlasher::loader_port_read(uint8_t* data, uint16_t size, uint32_t timeout) {
   assert(_serial && _serial->isOpen());
@@ -381,7 +413,7 @@ EspFlasher::loader_port_read(uint8_t* data, uint16_t size, uint32_t timeout) {
 /// \param  size                      Size of data in bytes
 /// \param  timeout                   Timeout in milliseconds
 /// \retval ESP_LOADER_SUCCESS        Success
-/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout elapsed
+/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout
 esp_loader_error_t EspFlasher::loader_port_write(uint8_t const* data,
                                                  uint16_t size,
                                                  uint32_t timeout) {

@@ -35,11 +35,12 @@ public:
              QString after,
              QString no_stub,
              QString trace,
-             QVector<Bin> bins);
+             QVector<Bin> bins = {});
   ~EspFlasher();
 
 public slots:
   esp_loader_error_t flash();
+  esp_loader_error_t erase();
 
 signals:
   void finished();

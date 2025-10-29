@@ -1,6 +1,8 @@
 # Changelog
 
-##
+## 1.10.0
+- Adopt esp-serial-flasher version number
+- Add `erase_flash` command
 - Update to esp-serial-flasher 1.10.0
 - Update to esptool-legacy-flasher-stub 1.9.0
 
