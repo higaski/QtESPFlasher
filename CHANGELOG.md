@@ -1,7 +1,8 @@
 # Changelog
 
 ##
-- Add ESP32-P4 ECO5 target and support
+- Update to esp-serial-flasher 1.10.0
+- Update to esptool-legacy-flasher-stub 1.9.0
 
 ## 0.1.1
 - Bugfix ESP32-C5 erase during flashing above 16MB
