@@ -32,9 +32,14 @@ public slots:
   void binaries(QVector<Bin> bins);
 
 private slots:
-  void startStopButtonClicked(bool start);
+  void flashButtonClicked(bool start);
+  void eraseButtonClicked(bool start);
 
 private:
+  void buttonClicked(bool start,
+                     QPushButton* button,
+                     esp_loader_error_t (EspFlasher::*action)());
+
   QComboBox* _chip_combobox{new QComboBox};
   QComboBox* _port_combobox{new QComboBox};
   QComboBox* _baud_combobox{new QComboBox};
@@ -42,7 +47,8 @@ private:
   QComboBox* _after_combobox{new QComboBox};
   QCheckBox* _no_stub_checkbox{new QCheckBox};
   QCheckBox* _trace_checkbox{new QCheckBox};
-  QPushButton* _start_stop_button{new QPushButton};
+  QPushButton* _flash_button{new QPushButton};
+  QPushButton* _erase_button{new QPushButton};
   QVector<Bin> _bins{};
   QThread* _thread{};
   EspFlasher* _esp_flasher{};

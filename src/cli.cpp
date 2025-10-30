@@ -59,15 +59,16 @@ int print_available_ports() {
 
 /// Execute write_flash command
 ///
-/// \retval 0   Success
-/// \retval -1  Error
+/// \param  parser  Command line parser
+/// \retval 0       Success
+/// \retval -1      Error
 int write_flash(QCommandLineParser const& parser) {
   auto pos_args{parser.positionalArguments()};
   pos_args.pop_front();
 
   if (pos_args.size() % 2) {
-    qCritical() << "write_flash: error: argument <offset> <filename>: Must be "
-                   "pairs of an offset and the binary filename to write there";
+    qCritical() << "write_flash: error: argument <address> <filename>: Must be "
+                   "pairs of an address and the binary filename to write there";
     return -1;
   }
 
@@ -88,14 +89,15 @@ int write_flash(QCommandLineParser const& parser) {
     bool ok{};
     auto const offset{pos_args[i].toUInt(&ok, 0)};
     if (!ok) {
-      qCritical() << "write_flash: error: argument <offset> <filename>: Offset"
-                  << pos_args[i] << "must be a number";
+      qCritical()
+        << "write_flash: error: argument <address> <filename>: Address"
+        << pos_args[i] << "must be a number";
       return -1;
     }
 
     QFile file{pos_args[i + 1]};
     if (!file.open(QIODeviceBase::ReadOnly)) {
-      qCritical() << "write_flash: error: argument <offset> <filename>: No "
+      qCritical() << "write_flash: error: argument <address> <filename>: No "
                      "such file or directory:"
                   << pos_args[i + 1];
       return -1;
@@ -105,6 +107,27 @@ int write_flash(QCommandLineParser const& parser) {
 
   EspFlasher esp_flasher{chip, port, baud, before, after, no_stub, trace, bins};
   return esp_flasher.flash();
+}
+
+/// Execute erase_flash command
+///
+/// \param  parser  Command line parser
+/// \retval 0       Success
+/// \retval -1      Error
+int erase_flash(QCommandLineParser const& parser) {
+  // Defaults
+  QString const chip{parser.isSet("chip") ? parser.value("chip") : "auto"};
+  QString const port{parser.isSet("port") ? parser.value("port") : "auto"};
+  QString const baud{parser.isSet("baud") ? parser.value("baud") : "auto"};
+  QString const before{parser.isSet("before") ? parser.value("before")
+                                              : "default_reset"};
+  QString const after{parser.isSet("after") ? parser.value("after")
+                                            : "hard_reset"};
+  QString const no_stub{parser.isSet("no-stub") ? "no-stub" : ""};
+  QString const trace{parser.isSet("trace") ? "trace" : ""};
+
+  EspFlasher esp_flasher{chip, port, baud, before, after, no_stub, trace};
+  return esp_flasher.erase();
 }
 
 } // namespace
@@ -137,9 +160,12 @@ int cli(QApplication const& app) {
   });
 
   // Add commands
-  parser.addPositionalArgument("write_flash",
-                               "Write a binary blob to flash\nwrite_flash "
-                               "<offset> <filename> [<offset> <filename> ...]");
+  parser.addPositionalArgument(
+    "write_flash",
+    "Write a binary blob to flash\nwrite_flash "
+    "<address> <filename> [<address> <filename> ...]");
+  parser.addPositionalArgument("erase_flash",
+                               "Perform Chip Erase on SPI flash");
 
   // Parse arguments
   parser.process(app);
@@ -150,5 +176,6 @@ int cli(QApplication const& app) {
   // Execute commands
   if (auto pos_args{parser.positionalArguments()}; !pos_args.size()) return 0;
   else if (pos_args.first() == "write_flash") return write_flash(parser);
+  else if (pos_args.first() == "erase_flash") return erase_flash(parser);
   else return -1;
 }
