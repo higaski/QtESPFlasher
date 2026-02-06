@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.0
+- Update to esp-serial-flasher 1.11.0
+- Update to esptool-legacy-flasher-stub 1.11.1
+
 ## 1.10.0
 - Adopt esp-serial-flasher version number
 - Add `erase_flash` command ([#6](https://github.com/higaski/QtESPFlasher/pull/6))

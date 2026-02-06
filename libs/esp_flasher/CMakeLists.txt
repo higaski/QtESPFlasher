@@ -16,13 +16,13 @@ if(NOT TARGET flasher)
     GITHUB_REPOSITORY
     "espressif/esp-serial-flasher"
     VERSION
-    1.10.0
+    1.11.0
     SYSTEM
     ON
     OPTIONS
     "PORT USER_DEFINED"
     # "MD5_ENABLED OFF" # Currently not working?!
-    "SERIAL_FLASHER_STUB_PULL_VERSION 1.9.0"
+    "SERIAL_FLASHER_STUB_PULL_VERSION 1.11.1"
     "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
   )
 endif()
@@ -32,10 +32,15 @@ if(NOT TARGET magic_enum)
 endif()
 
 if(NOT TARGET Microsoft.GSL::GSL)
-  cpmaddpackage("gh:microsoft/GSL@4.2.0")
+  cpmaddpackage("gh:microsoft/GSL@4.2.1")
 endif()
 
 target_link_libraries(
   ESPFlasher
   PUBLIC flasher Qt::Core Qt::SerialPort Qt::Widgets
   PRIVATE magic_enum::magic_enum Microsoft.GSL::GSL)
+
+if(PROJECT_IS_TOP_LEVEL)
+  add_include_what_you_must_target(ESPFlasherIncludeWhatYouMust TARGET
+                                   ESPFlasher)
+endif()
