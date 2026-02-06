@@ -1,0 +1,17 @@
+name: tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  include-what-you-must:
+    uses: ZIMO-Elektronik/.github-workflows/.github/workflows/x86_64-linux-gnu-gcc.yml@v0.2.1
+    with:
+      pre-build: |
+        sudo apt update -y
+        sudo apt install -y libgl1-mesa-dev libglx-dev libqt6svg6* qt6-base-dev qt6-5compat-dev qt6-serialport-dev
+      args: -DCMAKE_BUILD_TYPE=Debug
+      target: ESPFlasherIncludeWhatYouMust
