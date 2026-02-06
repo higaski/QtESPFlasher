@@ -132,7 +132,7 @@ Done
 QtESPFlasher offers a few different ways to select binaries for flashing.
 
 #### Add Directory
-The build directory of an ESP-IDF project can be selected directly using the ![folder open](data/icons/folder_open.png) symbol. ESP-IDF builds generate a file called `flasher_args.json` which contains project flash information in JSON format. This file is red by QtESPFlasher to obtain all of the projects binaries and their offsets.  
+The build directory of an ESP-IDF project can be selected directly using the ![folder open](data/icons/folder_open.png) symbol. ESP-IDF builds generate a file called `flasher_args.json` which contains project flash information in JSON format. This file is read by QtESPFlasher to obtain all of the projects binaries and their offsets.  
 ![usage add dir](data/images/usage_add_dir.gif)
 
 #### Add .zip Archive
