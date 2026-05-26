@@ -28,11 +28,11 @@ if(NOT TARGET flasher)
 endif()
 
 if(NOT TARGET magic_enum)
-  cpmaddpackage("gh:Neargye/magic_enum@0.9.7")
+  cpmaddpackage("gh:Neargye/magic_enum@0.9.8")
 endif()
 
 if(NOT TARGET Microsoft.GSL::GSL)
-  cpmaddpackage("gh:microsoft/GSL@4.2.1")
+  cpmaddpackage("gh:microsoft/GSL@4.2.2")
 endif()
 
 target_link_libraries(

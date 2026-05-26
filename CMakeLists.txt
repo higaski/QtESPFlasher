@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
-  GIT_TAG v0.12.2
+  GIT_TAG v0.12.4
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -426,7 +426,7 @@ if(NOT TARGET QuaZip::QuaZip)
     GITHUB_REPOSITORY
     "stachenov/quazip"
     VERSION
-    1.5
+    1.6
     SYSTEM
     ON
     OPTIONS
