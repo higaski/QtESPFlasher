@@ -426,7 +426,7 @@ if(NOT TARGET QuaZip::QuaZip)
     GITHUB_REPOSITORY
     "stachenov/quazip"
     VERSION
-    1.6
+    1.7.0
     SYSTEM
     ON
     OPTIONS
