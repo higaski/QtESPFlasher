@@ -1,4 +1,5 @@
 // Copyright (C) 2024 Vincent Hamp
+// Copyright (C) 2026 Jaroslav Burian
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,6 +101,30 @@ EspFlasher::EspFlasher(QString chip,
   _no_stub = no_stub;
   _trace = trace;
   _bins = bins;
+
+  // Point loader to ops
+  esp_loader_port_t::ops = this;
+
+  // Link ops
+  esp_loader_port_ops_t::init = NULL;
+  esp_loader_port_ops_t::deinit = NULL;
+  esp_loader_port_ops_t::enter_bootloader = loader_port_enter_bootloader;
+  esp_loader_port_ops_t::reset_target = loader_port_reset_target;
+  esp_loader_port_ops_t::start_timer = loader_port_start_timer;
+  esp_loader_port_ops_t::remaining_time = loader_port_remaining_time;
+  esp_loader_port_ops_t::delay_ms = loader_port_delay_ms;
+  esp_loader_port_ops_t::log = loader_port_log;
+  esp_loader_port_ops_t::log_hex = loader_port_log_hex;
+  esp_loader_port_ops_t::change_transmission_rate =
+    loader_port_change_transmission_rate;
+  esp_loader_port_ops_t::write = loader_port_write;
+  esp_loader_port_ops_t::read = loader_port_read;
+  esp_loader_port_ops_t::spi_set_cs = NULL;
+  esp_loader_port_ops_t::sdio_write = NULL;
+  esp_loader_port_ops_t::sdio_read = NULL;
+  esp_loader_port_ops_t::sdio_card_init = NULL;
+
+  esp_loader_init_serial(this, this);
 }
 
 EspFlasher::~EspFlasher() {
@@ -115,7 +140,7 @@ EspFlasher::~EspFlasher() {
   _time_end = {};
 
   // Make sure internal esp_stub_running flag is reset
-  esp_loader_reset_target();
+  esp_loader_reset_target(this);
 }
 
 /// Flash all binaries
@@ -136,7 +161,7 @@ esp_loader_error_t EspFlasher::flash() {
   }
 
   // Change to higher baud rate
-  if (_baud == "auto" && esp_loader_get_target() != ESP8266_CHIP)
+  if (_baud == "auto" && esp_loader_get_target(this) != ESP8266_CHIP)
     if (auto const err{changeBaudRate()}; err != ESP_LOADER_SUCCESS) {
       qCritical().noquote().nospace()
         << "Cannot change baud rate (" << qstrerr(err) << ")";
@@ -153,7 +178,7 @@ esp_loader_error_t EspFlasher::flash() {
 
   if (_after == "hard_reset") {
     qInfo().noquote() << "Hard resetting via RTS pin...";
-    loader_port_reset_target();
+    loader_port_reset_target(this);
   }
 
   qInfo().noquote() << "Done";
@@ -178,14 +203,14 @@ esp_loader_error_t EspFlasher::erase() {
 
   // Erase
   qInfo().nospace() << "Erasing flash (this may take a while)...";
-  if (auto const err{esp_loader_flash_erase()}; err != ESP_LOADER_SUCCESS) {
+  if (auto const err{esp_loader_flash_erase(this)}; err != ESP_LOADER_SUCCESS) {
     qCritical().noquote().nospace() << "Erase failed (" << qstrerr(err) << ")";
     return err;
   }
 
   if (_after == "hard_reset") {
     qInfo().noquote() << "Hard resetting via RTS pin...";
-    loader_port_reset_target();
+    loader_port_reset_target(this);
   }
 
   qInfo().noquote() << "Done";
@@ -200,18 +225,27 @@ esp_loader_error_t EspFlasher::erase() {
 /// \retval ESP_LOADER_ERROR_INVALID_RESPONSE Internal error
 /// \retval ESP_LOADER_ERROR_UNSUPPORTED_FUNC Unsupported on the target
 esp_loader_error_t EspFlasher::changeBaudRate() {
-  if (auto const err{
-        _no_stub == "no-stub"
-          ? esp_loader_change_transmission_rate(_higher_baud)
-          : esp_loader_change_transmission_rate_stub(
-              _baud == "auto" ? _default_baud : _baud.toInt(), _higher_baud)};
+  if (auto const err{esp_loader_change_transmission_rate(this, _higher_baud)};
       err != ESP_LOADER_SUCCESS)
     return err;
-  if (auto const err{loader_port_change_transmission_rate(_higher_baud)};
+  if (auto const err{loader_port_change_transmission_rate(this, _higher_baud)};
       err != ESP_LOADER_SUCCESS)
     return err;
   qInfo().noquote() << "Changing baud rate to " + QString::number(_higher_baud);
   return ESP_LOADER_SUCCESS;
+}
+
+///
+void EspFlasher::trace(QString const& str) {
+  if (_trace != "trace") return;
+
+  static auto const log_path{
+    QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
+  static auto fd{fopen(log_path.c_str(), "w")};
+  static gsl::final_action close{[] { fclose(fd); }};
+
+  auto const utf8{str.toUtf8()};
+  fwrite(utf8.constData(), 1, utf8.size(), fd);
 }
 
 /// Open serial port
@@ -230,7 +264,7 @@ QSerialPort::SerialPortError EspFlasher::open(QString port, QString baud) {
   if (!_serial->setDataBits(QSerialPort::Data8)) return _serial->error();
   if (!_serial->setStopBits(QSerialPort::OneStop)) return _serial->error();
   if (!_serial->setParity(QSerialPort::NoParity)) return _serial->error();
-  if (!_serial->setFlowControl(QSerialPort::SoftwareControl))
+  if (!_serial->setFlowControl(QSerialPort::NoFlowControl))
     return _serial->error();
 
   auto fd{_serial->handle()};
@@ -242,7 +276,7 @@ QSerialPort::SerialPortError EspFlasher::open(QString port, QString baud) {
   // DTR low, RTS low
   flags |= TIOCM_DTR | TIOCM_RTS;
   ioctl(fd, TIOCMSET, &flags);
-  loader_port_delay_ms(_reset_hold_time_ms);
+  loader_port_delay_ms(this, _reset_hold_time_ms);
 #elif defined(Q_OS_WIN)
   DCB dcb;
   GetCommState(fd, &dcb);
@@ -251,7 +285,7 @@ QSerialPort::SerialPortError EspFlasher::open(QString port, QString baud) {
   dcb.fDtrControl = DTR_CONTROL_ENABLE;
   dcb.fRtsControl = RTS_CONTROL_ENABLE;
   SetCommState(fd, &dcb);
-  loader_port_delay_ms(_reset_hold_time_ms);
+  loader_port_delay_ms(this, _reset_hold_time_ms);
 #endif
 
   return QSerialPort::NoError;
@@ -284,7 +318,8 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
       // Can't open port
       if (open(_port, _baud) != QSerialPort::NoError) continue;
       // Can't connect
-      else if ((err = connect_func(&connect_config)) != ESP_LOADER_SUCCESS)
+      else if ((err = connect_func(this, &connect_config)) !=
+               ESP_LOADER_SUCCESS)
         continue;
       // Done
       break;
@@ -297,7 +332,7 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
     // Can't open port
     if (open(_port, _baud) != QSerialPort::NoError) return err;
     // Can't connect
-    else if ((err = connect_func(&connect_config)) != ESP_LOADER_SUCCESS)
+    else if ((err = connect_func(this, &connect_config)) != ESP_LOADER_SUCCESS)
       return err;
   }
 
@@ -305,7 +340,7 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
   if (err != ESP_LOADER_SUCCESS) return err;
 
   // Target supported
-  auto const target{esp_loader_get_target()};
+  auto const target{esp_loader_get_target(this)};
   if (target >= ESP_UNKNOWN_CHIP) {
     qCritical().noquote() << "Unknown chip";
     return ESP_LOADER_ERROR_UNSUPPORTED_CHIP;
@@ -336,13 +371,15 @@ EspFlasher::connect(esp_loader_connect_args_t connect_config) {
 /// \retval ESP_LOADER_ERROR_TIMEOUT        Timeout
 /// \retval ESP_LOADER_ERROR_INVALID_PARAM  Invalid parameter
 esp_loader_error_t EspFlasher::flash(Bin const& bin) {
-  constexpr uint32_t block_size{1024u};
+  esp_loader_flash_cfg_t flash_cfg{.offset = bin.offset,
+                                   .image_size =
+                                     static_cast<uint32_t>(bin.bytes.size()),
+                                   .block_size = 1024u};
 
   qInfo().nospace()
     << "Flash will be erased from 0x" << Qt::hex << bin.offset << " to 0x"
     << align(4096u, static_cast<size_t>(bin.offset + bin.bytes.size())) - 1u;
-  if (auto const err{esp_loader_flash_start(
-        bin.offset, static_cast<uint32_t>(bin.bytes.size()), block_size)};
+  if (auto const err{esp_loader_flash_start(this, &flash_cfg)};
       err != ESP_LOADER_SUCCESS) {
     qCritical().noquote().nospace()
       << "Erasing flash failed (" << qstrerr(err) << ")";
@@ -355,13 +392,15 @@ esp_loader_error_t EspFlasher::flash(Bin const& bin) {
   auto const last{bin.bytes.cend()};
   auto progress_it{first};
   auto const progress_step_size{bin.bytes.size() / 10};
+  assert(progress_step_size);
   while (first < last) {
     // Write flash
-    QByteArray payload(block_size, -1);
+    QByteArray payload(flash_cfg.block_size, -1);
     auto const to_read{
-      std::min(static_cast<uint32_t>(last - first), block_size)};
+      std::min(static_cast<uint32_t>(last - first), flash_cfg.block_size)};
     std::copy_n(first, to_read, payload.begin());
-    if (auto const err{esp_loader_flash_write(payload.data(), to_read)};
+    if (auto const err{
+          esp_loader_flash_write(this, &flash_cfg, payload.data(), to_read)};
         err != ESP_LOADER_SUCCESS) {
       qCritical().noquote().nospace()
         << "Writing flash failed (" << qstrerr(err) << ")";
@@ -381,67 +420,11 @@ esp_loader_error_t EspFlasher::flash(Bin const& bin) {
     ESP_RETURN_ON_INTERRUPTION_REQUESTED();
   }
 
-#if MD5_ENABLED
-  if (auto const err{esp_loader_flash_verify()};
-      err == ESP_LOADER_ERROR_UNSUPPORTED_FUNC)
-    printf("ESP8266 does not support flash verify command.");
-  else if (err != ESP_LOADER_SUCCESS) {
-    printf("MD5 does not match. err: %d\n", err);
-    return err;
-  }
-  printf("Flash verified\n");
-#endif
-
-  return ESP_LOADER_SUCCESS;
-}
-
-/// Reads data from the io interface
-///
-/// \param  data                      Buffer for received data
-/// \param  size                      Number of bytes to read
-/// \param  timeout                   Timeout in milliseconds
-/// \retval ESP_LOADER_SUCCESS        Success
-/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout
-esp_loader_error_t
-EspFlasher::loader_port_read(uint8_t* data, uint16_t size, uint32_t timeout) {
-  assert(_serial && _serial->isOpen());
-  auto const then{steady_clock::now() + milliseconds{timeout}};
-  while (_serial->bytesAvailable() < size) {
-    _serial->waitForReadyRead(0);
-    if (steady_clock::now() >= then) return ESP_LOADER_ERROR_TIMEOUT;
-  }
-  if (_serial->read(bit_cast<char*>(data), size) != size)
-    return ESP_LOADER_ERROR_FAIL;
-  else {
-    transfer_debug_print(data, size, false);
-    return ESP_LOADER_SUCCESS;
-  }
-}
-
-/// Writes data over the io interface.
-///
-/// \param  data                      Buffer with data to be written
-/// \param  size                      Size of data in bytes
-/// \param  timeout                   Timeout in milliseconds
-/// \retval ESP_LOADER_SUCCESS        Success
-/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout
-esp_loader_error_t EspFlasher::loader_port_write(uint8_t const* data,
-                                                 uint16_t size,
-                                                 uint32_t timeout) {
-  assert(_serial && _serial->isOpen());
-  auto const then{steady_clock::now() + milliseconds{timeout}};
-  if (_serial->write(bit_cast<char*>(data), size) != size)
-    return ESP_LOADER_ERROR_FAIL;
-  while (_serial->bytesToWrite()) {
-    _serial->waitForBytesWritten(0);
-    if (steady_clock::now() >= then) return ESP_LOADER_ERROR_TIMEOUT;
-  }
-  transfer_debug_print(data, size, true);
-  return ESP_LOADER_SUCCESS;
+  return esp_loader_flash_finish(this, &flash_cfg);
 }
 
 /// Asserts bootstrap pins to enter boot mode and toggles reset pin
-void EspFlasher::loader_port_enter_bootloader() {
+void EspFlasher::loader_port_enter_bootloader(esp_loader_port_t* port) {
   if (_before != "default_reset") return;
   assert(_serial && _serial->isOpen());
 
@@ -455,13 +438,13 @@ void EspFlasher::loader_port_enter_bootloader() {
   flags &= ~(TIOCM_DTR | TIOCM_RTS);
   flags |= TIOCM_RTS;
   ioctl(fd, TIOCMSET, &flags);
-  loader_port_delay_ms(_reset_hold_time_ms);
+  loader_port_delay_ms(port, _reset_hold_time_ms);
 
   // DTR low, RTS high
   flags &= ~(TIOCM_DTR | TIOCM_RTS);
   flags |= TIOCM_DTR;
   ioctl(fd, TIOCMSET, &flags);
-  loader_port_delay_ms(_boot_hold_time_ms);
+  loader_port_delay_ms(port, _boot_hold_time_ms);
 
   // DTR low, RTS low
   flags &= ~(TIOCM_DTR | TIOCM_RTS);
@@ -477,13 +460,13 @@ void EspFlasher::loader_port_enter_bootloader() {
   dcb.fDtrControl = DTR_CONTROL_DISABLE;
   dcb.fRtsControl = RTS_CONTROL_ENABLE;
   SetCommState(fd, &dcb);
-  loader_port_delay_ms(_reset_hold_time_ms);
+  loader_port_delay_ms(port, _reset_hold_time_ms);
 
   // DTR low, RTS high
   dcb.fDtrControl = DTR_CONTROL_ENABLE;
   dcb.fRtsControl = RTS_CONTROL_DISABLE;
   SetCommState(fd, &dcb);
-  loader_port_delay_ms(_boot_hold_time_ms);
+  loader_port_delay_ms(port, _boot_hold_time_ms);
 
   // DTR low, RTS low
   dcb.fDtrControl = DTR_CONTROL_ENABLE;
@@ -492,17 +475,19 @@ void EspFlasher::loader_port_enter_bootloader() {
 #endif
 }
 
-/// Delay in milliseconds
-///
-/// \param  ms  Number of milliseconds
-void EspFlasher::loader_port_delay_ms(uint32_t ms) {
-  std::this_thread::sleep_for(milliseconds{ms});
+/// Toggles reset pin
+void EspFlasher::loader_port_reset_target(esp_loader_port_t* port) {
+  if (_after != "hard_reset") return;
+  assert(_serial && _serial->isOpen());
+  _serial->setDataTerminalReady(false);
+  loader_port_delay_ms(port, _reset_hold_time_ms);
+  _serial->setDataTerminalReady(true);
 }
 
 /// Starts timeout timer
 ///
 /// \param  ms  Number of milliseconds
-void EspFlasher::loader_port_start_timer(uint32_t ms) {
+void EspFlasher::loader_port_start_timer(esp_loader_port_t*, uint32_t ms) {
   _time_end = steady_clock::now() + milliseconds{ms};
 }
 
@@ -510,7 +495,7 @@ void EspFlasher::loader_port_start_timer(uint32_t ms) {
 /// esp_loader_start_timer or 0 if timer has elapsed.
 ///
 /// \return Number of milliseconds
-uint32_t EspFlasher::loader_port_remaining_time() {
+uint32_t EspFlasher::loader_port_remaining_time(esp_loader_port_t*) {
   auto const remaining{
     duration_cast<milliseconds>(_time_end - steady_clock::now())};
   return remaining > milliseconds::zero()
@@ -518,13 +503,53 @@ uint32_t EspFlasher::loader_port_remaining_time() {
            : 0u;
 }
 
-/// Toggles reset pin
-void EspFlasher::loader_port_reset_target() {
-  if (_after != "hard_reset") return;
-  assert(_serial && _serial->isOpen());
-  _serial->setDataTerminalReady(false);
-  loader_port_delay_ms(_reset_hold_time_ms);
-  _serial->setDataTerminalReady(true);
+/// Delay in milliseconds
+///
+/// \param  ms  Number of milliseconds
+void EspFlasher::loader_port_delay_ms(esp_loader_port_t*, uint32_t ms) {
+  std::this_thread::sleep_for(milliseconds{ms});
+}
+
+/// Logs a formatted text message at the given level
+///
+/// \param  level Log level
+/// \param  fmt   Format string
+/// \param  args  Arguments
+void EspFlasher::loader_port_log(esp_loader_port_t*,
+                                 esp_loader_log_level_t level,
+                                 char const* fmt,
+                                 va_list args) {
+  assert(level);
+  // copied from `loader_port_stdio_log`
+  return trace(QString("[%1] %2\n")
+                 .arg(_level_prefix[level])
+                 .arg(QString::vasprintf(fmt, args)));
+}
+
+/// Logs a binary buffer dump at the given level
+///
+/// \param  level Log level
+/// \param  label Optional human-readable label (may be NULL)
+/// \param  data  Pointer to the raw bytes to display
+/// \param  size  Number of bytes
+void EspFlasher::loader_port_log_hex(esp_loader_port_t*,
+                                     esp_loader_log_level_t level,
+                                     char const* label,
+                                     uint8_t const* data,
+                                     size_t size) {
+  assert(level);
+  // copied from `loader_port_stdio_log_hex`
+  QString str;
+  str += QString("[%1] %2 (%3 bytes):\n")
+           .arg(_level_prefix[level])
+           .arg(label ? label : "hex")
+           .arg(size);
+  for (auto i{0u}; i < size; ++i) {
+    str += QString("%1 ").arg(data[i], 2, 16, QChar('0'));
+    if ((i + 1u) % 16u == 0u) str += '\n';
+  }
+  if (size % 16u != 0u) str += '\n';
+  trace(str);
 }
 
 /// Change baud rate
@@ -533,32 +558,53 @@ void EspFlasher::loader_port_reset_target() {
 /// \retval ESP_LOADER_SUCCESS    Success
 /// \retval ESP_LOADER_ERROR_FAIL Failure
 esp_loader_error_t
-EspFlasher::loader_port_change_transmission_rate(uint32_t baudrate) {
+EspFlasher::loader_port_change_transmission_rate(esp_loader_port_t*,
+                                                 uint32_t rate) {
   assert(_serial && _serial->isOpen());
-  return _serial->setBaudRate(static_cast<int>(baudrate))
-           ? ESP_LOADER_SUCCESS
-           : ESP_LOADER_ERROR_FAIL;
+  return _serial->setBaudRate(static_cast<int>(rate)) ? ESP_LOADER_SUCCESS
+                                                      : ESP_LOADER_ERROR_FAIL;
 }
 
-void EspFlasher::loader_port_debug_print(char const* str) { qDebug() << str; }
-
-/// Log to trace.txt
-void EspFlasher::transfer_debug_print(uint8_t const* data,
-                                      uint16_t size,
-                                      bool write) {
-  if (_trace != "trace") return;
-
-  static auto const log_path{
-    QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
-  static auto fd{fopen(log_path.c_str(), "w")};
-  static gsl::final_action close{[] { fclose(fd); }};
-
-  static bool write_prev{};
-
-  if (write_prev != write) {
-    write_prev = write;
-    fprintf(fd, "\n--- %s ---\n", write ? "WRITE" : "READ");
+/// Writes data over the io interface
+///
+/// \param  data                      Buffer with data to be written
+/// \param  size                      Size of data in bytes
+/// \param  timeout                   Timeout in milliseconds
+/// \retval ESP_LOADER_SUCCESS        Success
+/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout
+esp_loader_error_t EspFlasher::loader_port_write(esp_loader_port_t*,
+                                                 uint8_t const* data,
+                                                 uint16_t size,
+                                                 uint32_t timeout) {
+  assert(_serial && _serial->isOpen());
+  auto const then{steady_clock::now() + milliseconds{timeout}};
+  if (_serial->write(bit_cast<char*>(data), size) != size)
+    return ESP_LOADER_ERROR_FAIL;
+  while (_serial->bytesToWrite()) {
+    _serial->waitForBytesWritten(0);
+    if (steady_clock::now() >= then) return ESP_LOADER_ERROR_TIMEOUT;
   }
+  return ESP_LOADER_SUCCESS;
+}
 
-  for (auto i{0u}; i < size; i++) fprintf(fd, "%02x ", data[i]);
+/// Reads data from the io interface
+///
+/// \param  data                      Buffer for received data
+/// \param  size                      Number of bytes to read
+/// \param  timeout                   Timeout in milliseconds
+/// \retval ESP_LOADER_SUCCESS        Success
+/// \retval ESP_LOADER_ERROR_TIMEOUT  Timeout
+esp_loader_error_t EspFlasher::loader_port_read(esp_loader_port_t*,
+                                                uint8_t* data,
+                                                uint16_t size,
+                                                uint32_t timeout) {
+  assert(_serial && _serial->isOpen());
+  auto const then{steady_clock::now() + milliseconds{timeout}};
+  while (_serial->bytesAvailable() < size) {
+    _serial->waitForReadyRead(0);
+    if (steady_clock::now() >= then) return ESP_LOADER_ERROR_TIMEOUT;
+  }
+  if (_serial->read(bit_cast<char*>(data), size) != size)
+    return ESP_LOADER_ERROR_FAIL;
+  else return ESP_LOADER_SUCCESS;
 }
