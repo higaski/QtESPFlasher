@@ -34,8 +34,10 @@
 /// QObject wrapped esp-serial-flasher
 ///
 /// EspFlasher wraps the esp-serial-flasher library into a singleton QObject.
-/// Currently EspFlasher only supports flashing binaries.
-class EspFlasher : public QObject {
+class EspFlasher : public QObject,
+                   public esp_loader_t,           // Context
+                   public esp_loader_port_t,      // Port
+                   public esp_loader_port_ops_t { // Port base
   Q_OBJECT
 
 public:
@@ -57,37 +59,37 @@ signals:
   void finished();
 
 private:
-  static QSerialPort::SerialPortError open(QString port = _port,
-                                           QString baud = _baud);
-  static esp_loader_error_t connect(
+  QSerialPort::SerialPortError open(QString port = _port, QString baud = _baud);
+  esp_loader_error_t connect(
     esp_loader_connect_args_t connect_config = ESP_LOADER_CONNECT_DEFAULT());
-  static esp_loader_error_t flash(Bin const& bin);
-  static esp_loader_error_t changeBaudRate();
+  esp_loader_error_t flash(Bin const& bin);
+  esp_loader_error_t changeBaudRate();
 
-  // Mandatory
-  static esp_loader_error_t loader_port_read(
-    uint8_t* data, uint16_t size, uint32_t timeout) asm("loader_port_read");
+  // Callbacks for esp_loader_port_ops_t
+  static void loader_port_enter_bootloader(esp_loader_port_t* port);
+  static void loader_port_reset_target(esp_loader_port_t* port);
+  static void loader_port_start_timer(esp_loader_port_t*, uint32_t ms);
+  static uint32_t loader_port_remaining_time(esp_loader_port_t*);
+  static void loader_port_delay_ms(esp_loader_port_t*, uint32_t ms);
+  static void loader_port_log(esp_loader_port_t*,
+                              esp_loader_log_level_t level,
+                              char const* fmt,
+                              va_list args);
+  static void loader_port_log_hex(esp_loader_port_t*,
+                                  esp_loader_log_level_t level,
+                                  char const* label,
+                                  uint8_t const* data,
+                                  size_t size);
   static esp_loader_error_t
-  loader_port_write(uint8_t const* data,
-                    uint16_t size,
-                    uint32_t timeout) asm("loader_port_write");
-  static void
-  loader_port_enter_bootloader() asm("loader_port_enter_bootloader");
-  static void loader_port_delay_ms(uint32_t ms) asm("loader_port_delay_ms");
-  static void
-  loader_port_start_timer(uint32_t ms) asm("loader_port_start_timer");
-  static uint32_t
-  loader_port_remaining_time() asm("loader_port_remaining_time");
-
-  // Convenience
-  static esp_loader_error_t loader_port_change_transmission_rate(
-    uint32_t baudrate) asm("loader_port_change_transmission_rate");
-  static void loader_port_reset_target() asm("loader_port_reset_target");
-  static void
-  loader_port_debug_print(char const* str) asm("loader_port_debug_print");
-
-  static void
-  transfer_debug_print(uint8_t const* data, uint16_t size, bool write);
+  loader_port_change_transmission_rate(esp_loader_port_t*, uint32_t rate);
+  static esp_loader_error_t loader_port_write(esp_loader_port_t*,
+                                              uint8_t const* data,
+                                              uint16_t size,
+                                              uint32_t timeout);
+  static esp_loader_error_t loader_port_read(esp_loader_port_t*,
+                                             uint8_t* data,
+                                             uint16_t size,
+                                             uint32_t timeout);
 
   static inline std::unique_ptr<QSerialPort> _serial;
   static inline QString _chip;
