@@ -374,7 +374,7 @@ esp_loader_error_t EspFlasher::flash(Bin const& bin) {
     .offset = bin.offset,
     .image_size = static_cast<uint32_t>(bin.bytes.size()),
     .block_size = 1024u,
-    .skip_verify = true,
+    // .skip_verify = true,
   };
 
   qInfo().nospace()
