@@ -15,6 +15,7 @@ It currently supports the following ESP microcontrollers:
 - [ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2)
 - [ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6)
 - [ESP32-P4](https://www.espressif.com/en/products/socs/esp32-p4)
+- [ESP32-C61](https://www.espressif.com/en/products/socs/esp32-c61)
 
 <details>
   <summary>Table of Contents</summary>
