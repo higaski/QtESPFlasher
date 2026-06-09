@@ -263,7 +263,7 @@ QSerialPort::SerialPortError EspFlasher::open(QString port, QString baud) {
   if (!_serial->setDataBits(QSerialPort::Data8)) return _serial->error();
   if (!_serial->setStopBits(QSerialPort::OneStop)) return _serial->error();
   if (!_serial->setParity(QSerialPort::NoParity)) return _serial->error();
-  if (!_serial->setFlowControl(QSerialPort::SoftwareControl))
+  if (!_serial->setFlowControl(QSerialPort::NoFlowControl))
     return _serial->error();
 
   auto fd{_serial->handle()};
