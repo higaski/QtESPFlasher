@@ -228,6 +228,19 @@ esp_loader_error_t EspFlasher::changeBaudRate() {
   return ESP_LOADER_SUCCESS;
 }
 
+///
+void EspFlasher::log(QString const& str) {
+  if (_trace != "trace") return;
+
+  static auto const log_path{
+    QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
+  static auto fd{fopen(log_path.c_str(), "w")};
+  static gsl::final_action close{[] { fclose(fd); }};
+
+  auto const utf8{str.toUtf8()};
+  fwrite(utf8.constData(), 1, utf8.size(), fd);
+}
+
 /// Open serial port
 ///
 /// DTR and RTS both low (true) after that
@@ -496,11 +509,10 @@ void EspFlasher::loader_port_log(esp_loader_port_t*,
                                  esp_loader_log_level_t level,
                                  char const* fmt,
                                  va_list args) {
-  // if (level >= ...)
   // copied from `loader_port_stdio_log`
-  qInfo().noquote() << QString("[%1] %2")
-                         .arg(_level_prefix[level])
-                         .arg(QString::vasprintf(fmt, args));
+  return log(QString("[%1] %2\n")
+               .arg(_level_prefix[level])
+               .arg(QString::vasprintf(fmt, args)));
 }
 
 /// Log to trace.txt
@@ -509,24 +521,18 @@ void EspFlasher::loader_port_log_hex(esp_loader_port_t*,
                                      char const* label,
                                      uint8_t const* data,
                                      size_t size) {
-  if (_trace != "trace") return;
-
-  static auto const log_path{
-    QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
-  static auto fd{fopen(log_path.c_str(), "w")};
-  static gsl::final_action close{[] { fclose(fd); }};
-
   // copied from `loader_port_stdio_log_hex`
-  fprintf(fd,
-          "[%s] %s (%zu bytes):\n",
-          _level_prefix[level],
-          label ? label : "hex",
-          size);
+  QString str;
+  str += QString("[%1] %2 (%3 bytes):\n")
+           .arg(_level_prefix[level])
+           .arg(label ? label : "hex")
+           .arg(size);
   for (auto i{0u}; i < size; ++i) {
-    fprintf(fd, "%02x ", data[i]);
-    if ((i + 1u) % 16u == 0u) fprintf(fd, "\n");
+    str += QString("%1 ").arg(data[i], 2, 16, QChar('0'));
+    if ((i + 1u) % 16u == 0u) str += '\n';
   }
-  if (size % 16u != 0u) fprintf(fd, "\n");
+  if (size % 16u != 0u) str += '\n';
+  log(str);
 }
 
 /// Change baud rate

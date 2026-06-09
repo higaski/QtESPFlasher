@@ -64,6 +64,7 @@ private:
     esp_loader_connect_args_t connect_config = ESP_LOADER_CONNECT_DEFAULT());
   esp_loader_error_t flash(Bin const& bin);
   esp_loader_error_t changeBaudRate();
+  static void log(QString const& str);
 
   // Callbacks for esp_loader_port_ops_t
   static void loader_port_enter_bootloader(esp_loader_port_t* port);
