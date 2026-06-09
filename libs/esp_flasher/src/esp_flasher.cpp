@@ -101,8 +101,10 @@ EspFlasher::EspFlasher(QString chip,
   _trace = trace;
   _bins = bins;
 
+  // Point loader to ops
   esp_loader_port_t::ops = this;
 
+  // Link ops
   esp_loader_port_ops_t::init = NULL;
   esp_loader_port_ops_t::deinit = NULL;
   esp_loader_port_ops_t::enter_bootloader = loader_port_enter_bootloader;
@@ -116,6 +118,10 @@ EspFlasher::EspFlasher(QString chip,
     loader_port_change_transmission_rate;
   esp_loader_port_ops_t::write = loader_port_write;
   esp_loader_port_ops_t::read = loader_port_read;
+  esp_loader_port_ops_t::spi_set_cs = NULL;
+  esp_loader_port_ops_t::sdio_write = NULL;
+  esp_loader_port_ops_t::sdio_read = NULL;
+  esp_loader_port_ops_t::sdio_card_init = NULL;
 
   esp_loader_init_serial(this, this);
 }
@@ -229,7 +235,7 @@ esp_loader_error_t EspFlasher::changeBaudRate() {
 }
 
 ///
-void EspFlasher::log(QString const& str) {
+void EspFlasher::trace(QString const& str) {
   if (_trace != "trace") return;
 
   static auto const log_path{
@@ -387,6 +393,7 @@ esp_loader_error_t EspFlasher::flash(Bin const& bin) {
   auto const last{bin.bytes.cend()};
   auto progress_it{first};
   auto const progress_step_size{bin.bytes.size() / 10};
+  assert(progress_step_size);
   while (first < last) {
     // Write flash
     QByteArray payload(flash_cfg.block_size, -1);
@@ -504,23 +511,34 @@ void EspFlasher::loader_port_delay_ms(esp_loader_port_t*, uint32_t ms) {
   std::this_thread::sleep_for(milliseconds{ms});
 }
 
-/// \todo
+/// Logs a formatted text message at the given level
+///
+/// \param  level Log level
+/// \param  fmt   Format string
+/// \param  args  Arguments
 void EspFlasher::loader_port_log(esp_loader_port_t*,
                                  esp_loader_log_level_t level,
                                  char const* fmt,
                                  va_list args) {
+  assert(level);
   // copied from `loader_port_stdio_log`
-  return log(QString("[%1] %2\n")
-               .arg(_level_prefix[level])
-               .arg(QString::vasprintf(fmt, args)));
+  return trace(QString("[%1] %2\n")
+                 .arg(_level_prefix[level])
+                 .arg(QString::vasprintf(fmt, args)));
 }
 
-/// Log to trace.txt
+/// Logs a binary buffer dump at the given level
+///
+/// \param  level Log level
+/// \param  label Optional human-readable label (may be NULL)
+/// \param  data  Pointer to the raw bytes to display
+/// \param  size  Number of bytes
 void EspFlasher::loader_port_log_hex(esp_loader_port_t*,
                                      esp_loader_log_level_t level,
                                      char const* label,
                                      uint8_t const* data,
                                      size_t size) {
+  assert(level);
   // copied from `loader_port_stdio_log_hex`
   QString str;
   str += QString("[%1] %2 (%3 bytes):\n")
@@ -532,7 +550,7 @@ void EspFlasher::loader_port_log_hex(esp_loader_port_t*,
     if ((i + 1u) % 16u == 0u) str += '\n';
   }
   if (size % 16u != 0u) str += '\n';
-  log(str);
+  trace(str);
 }
 
 /// Change baud rate
