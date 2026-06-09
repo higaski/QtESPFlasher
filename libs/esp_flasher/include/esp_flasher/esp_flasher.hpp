@@ -102,6 +102,7 @@ private:
   static inline QVector<Bin> _bins;
   static inline std::chrono::time_point<std::chrono::steady_clock> _time_end;
 
+  static constexpr std::array _level_prefix{"", "E", "W", "I", "D"};
   static constexpr int _default_baud{115200};
   static constexpr int _higher_baud{460800};
 

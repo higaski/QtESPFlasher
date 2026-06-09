@@ -18,7 +18,9 @@ if(NOT TARGET flasher)
     VERSION
     2.0.0
     SYSTEM
-    ON)
+    ON
+    OPTIONS
+    "SERIAL_FLASHER_LOG_LEVEL DEBUG")
 endif()
 
 if(NOT TARGET magic_enum)

@@ -495,14 +495,39 @@ void EspFlasher::loader_port_delay_ms(esp_loader_port_t*, uint32_t ms) {
 void EspFlasher::loader_port_log(esp_loader_port_t*,
                                  esp_loader_log_level_t level,
                                  char const* fmt,
-                                 va_list args) {}
+                                 va_list args) {
+  // if (level >= ...)
+  // copied from `loader_port_stdio_log`
+  qInfo().noquote() << QString("[%1] %2")
+                         .arg(_level_prefix[level])
+                         .arg(QString::vasprintf(fmt, args));
+}
 
-/// \todo
+/// Log to trace.txt
 void EspFlasher::loader_port_log_hex(esp_loader_port_t*,
                                      esp_loader_log_level_t level,
                                      char const* label,
                                      uint8_t const* data,
-                                     size_t size) {}
+                                     size_t size) {
+  if (_trace != "trace") return;
+
+  static auto const log_path{
+    QCoreApplication::applicationDirPath().toStdString() + "/../trace.log"};
+  static auto fd{fopen(log_path.c_str(), "w")};
+  static gsl::final_action close{[] { fclose(fd); }};
+
+  // copied from `loader_port_stdio_log_hex`
+  fprintf(fd,
+          "[%s] %s (%zu bytes):\n",
+          _level_prefix[level],
+          label ? label : "hex",
+          size);
+  for (auto i{0u}; i < size; ++i) {
+    fprintf(fd, "%02x ", data[i]);
+    if ((i + 1u) % 16u == 0u) fprintf(fd, "\n");
+  }
+  if (size % 16u != 0u) fprintf(fd, "\n");
+}
 
 /// Change baud rate
 ///
