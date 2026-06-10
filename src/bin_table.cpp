@@ -140,7 +140,11 @@ void BinTable::addBin(QString bin_path, QString offset) {
 /// \param  json_path Json path
 void BinTable::addJson(QString json_path) {
   QFile file{json_path};
-  file.open(QIODevice::ReadOnly | QIODevice::Text);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qCritical().noquote() << "Opening" << QFileInfo{file}.fileName()
+                          << "failed";
+    return;
+  }
   QJsonDocument doc{QJsonDocument::fromJson(file.readAll())};
   auto const flash_files{doc["flash_files"]};
   if (flash_files == QJsonValue::Undefined) return;
@@ -225,7 +229,11 @@ void BinTable::readBinaries() {
 
     // Read file
     QFile file{bin_path->text()};
-    file.open(QIODevice::ReadOnly);
+    if (!file.open(QIODevice::ReadOnly)) {
+      qCritical().noquote()
+        << "Opening" << QFileInfo{file}.fileName() << "failed";
+      return;
+    }
     bins.push_back(
       {.offset = offset->text().toUInt(nullptr, 0), .bytes = file.readAll()});
   }

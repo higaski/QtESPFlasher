@@ -41,10 +41,11 @@ int gui(QApplication& app) {
   app.setFont(font);
 
   // Apply breeze stylesheet
-  QFile file{":/dark/stylesheet.qss"};
-  file.open(QFile::ReadOnly | QFile::Text);
-  QTextStream stream{&file};
-  app.setStyleSheet(stream.readAll());
+  if (QFile file{":/dark/stylesheet.qss"};
+      file.open(QFile::ReadOnly | QFile::Text)) {
+    QTextStream stream{&file};
+    app.setStyleSheet(stream.readAll());
+  }
 
   MainWindow w{};
   w.show();

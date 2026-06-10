@@ -20,10 +20,7 @@ if(NOT TARGET flasher)
     SYSTEM
     ON
     OPTIONS
-    "SERIAL_FLASHER_LOG_LEVEL DEBUG"
-    "SERIAL_FLASHER_STUB_PULL_VERSION 1.11.1"
-    "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
-  )
+    "SERIAL_FLASHER_LOG_LEVEL DEBUG")
 endif()
 
 if(NOT TARGET magic_enum)
