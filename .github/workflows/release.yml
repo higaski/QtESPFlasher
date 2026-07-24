@@ -18,10 +18,10 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v5.0.0
+      - uses: actions/download-artifact@v7
         with:
           path: artifacts
       - name: Find archive files
@@ -48,7 +48,7 @@ jobs:
             echo "$NOTES"
             echo "EOF"
           } >> $GITHUB_ENV
-      - uses: softprops/action-gh-release@v2.3.2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
