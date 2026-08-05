@@ -513,8 +513,8 @@ if(PROJECT_IS_TOP_LEVEL AND CMAKE_BUILD_TYPE STREQUAL Release)
     POST_BUILD
     COMMAND
       ${CMAKE_COMMAND} -E tar "cf"
-      QtESPFlasher-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-x64.zip --format=zip
-      *
+      QtESPFlasher-${PROJECT_VERSION}${IDENTIFIERS_FROM_GIT}-${CMAKE_SYSTEM_NAME}-x64.zip
+      --format=zip *
     WORKING_DIRECTORY ${TARGET_DIR})
 endif()
 
