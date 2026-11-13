@@ -16,14 +16,11 @@ if(NOT TARGET flasher)
     GITHUB_REPOSITORY
     "espressif/esp-serial-flasher"
     VERSION
-    2.0.0
+    2.1.0
     SYSTEM
     ON
     OPTIONS
-    "SERIAL_FLASHER_LOG_LEVEL DEBUG"
-    "SERIAL_FLASHER_STUB_PULL_VERSION 1.11.1"
-    "SERIAL_FLASHER_STUB_PULL_SOURCE https://github.com/espressif/esptool-legacy-flasher-stub/releases/download"
-  )
+    "SERIAL_FLASHER_LOG_LEVEL DEBUG")
 endif()
 
 if(NOT TARGET magic_enum)
@@ -31,7 +28,7 @@ if(NOT TARGET magic_enum)
 endif()
 
 if(NOT TARGET Microsoft.GSL::GSL)
-  cpmaddpackage("gh:microsoft/GSL@4.2.2")
+  cpmaddpackage("gh:microsoft/GSL@5.0.1")
 endif()
 
 target_link_libraries(
