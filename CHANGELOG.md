@@ -1,7 +1,7 @@
 # Changelog
 
-## 2.0.0
-- Update to esp-serial-flasher 2.0.0 ([#10](https://github.com/higaski/QtESPFlasher/pull/10))
+## 2.1.0
+- Update to esp-serial-flasher 2.1.0
 
 ## 1.11.0
 - Update to esp-serial-flasher 1.11.0
